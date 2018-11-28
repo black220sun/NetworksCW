@@ -1,6 +1,8 @@
 package org.blacksun.base;
 
-public class Channel {
+import org.blacksun.utils.StringRepresentable;
+
+public class Channel implements StringRepresentable {
     public enum Type {
         DUPLEX, HALFDUPLEX
     }
@@ -60,6 +62,11 @@ public class Channel {
 
     public void setErrors(double errors) {
         this.errors = errors;
+    }
+
+    @Override
+    public String stringRepresentation() {
+        return toString();
     }
 
     // node1 <--> node2 (weight=7, errors=12%)

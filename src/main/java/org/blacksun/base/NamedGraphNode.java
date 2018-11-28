@@ -12,8 +12,16 @@ public class NamedGraphNode implements GraphNode {
     protected List<Channel> connetions;
 
     public NamedGraphNode(String name) {
-        this.name = name;
+        this.name = name == null ? "Node" : name;
         connetions = new ArrayList<>();
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     @Override
@@ -55,16 +63,18 @@ public class NamedGraphNode implements GraphNode {
     }
 
     @Override
-    public String toFullString() {
+    public String stringRepresentation() {
         StringBuilder sb = new StringBuilder();
         sb.append(name).append(" [\n");
-        connetions.forEach(ch -> sb.append("\t").append(ch).append("\n"));
+        connetions.forEach(ch -> sb.append("\t")
+                .append(ch.stringRepresentation())
+                .append("\n"));
         sb.append("]");
         return sb.toString();
     }
 
     @Override
     public String toString() {
-        return "Node[name=" + name + ", connections=" + getOrder() + "]";
+        return "Node[name=" + name + ", order=" + getOrder() + "]";
     }
 }

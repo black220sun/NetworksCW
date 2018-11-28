@@ -1,11 +1,12 @@
 package org.blacksun.base;
 
 import org.blacksun.utils.Pair;
+import org.blacksun.utils.StringRepresentable;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-public interface GraphNode {
+public interface GraphNode extends StringRepresentable {
     List<GraphNode> getConnectedNodes();
     // returns list or connected nodes with the weight of connection
     List<Pair<GraphNode, Integer>> getConnections();
@@ -18,8 +19,5 @@ public interface GraphNode {
     boolean isConnected(@NotNull GraphNode node, int distance);
     void addConnectedNode(@NotNull GraphNode node, int weight);
     void removeConnectedNode(@NotNull GraphNode node);
-
     int getOrder();
-
-    String toFullString();
 }
