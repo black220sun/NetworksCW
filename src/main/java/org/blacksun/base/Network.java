@@ -13,7 +13,7 @@ public class Network implements StringRepresentable {
     }
 
     // TODO(cache?)
-    private double getAvgOrder() {
+    double getAvgOrder() {
         if (nodes.isEmpty())
             return 0;
         double sum = 0;

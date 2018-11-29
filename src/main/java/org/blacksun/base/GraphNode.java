@@ -10,14 +10,10 @@ public interface GraphNode extends StringRepresentable {
     List<GraphNode> getConnectedNodes();
     // returns list or connected nodes with the weight of connection
     List<Pair<GraphNode, Integer>> getConnections();
-    default boolean isConnected(@NotNull GraphNode node) {
-        return isConnected(node, 1);
-    }
-    // returns true if current node is connected to `node` with no more than `distance` links
-    // TODO(distance in links or in weight?)
-    // TODO(method for distance in weight?)
-    boolean isConnected(@NotNull GraphNode node, int distance);
+    boolean isConnected(@NotNull GraphNode node);
     void addConnectedNode(@NotNull GraphNode node, int weight);
+    void addConnection(@NotNull Channel channel);
     void removeConnectedNode(@NotNull GraphNode node);
+    void removeConnection(@NotNull Channel channel);
     int getOrder();
 }

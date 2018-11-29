@@ -2,14 +2,21 @@ package org.blacksun.base;
 
 import org.blacksun.utils.StringRepresentable;
 
+import java.util.Objects;
+
+/**
+ * Represents connection between two nodes from one network.
+ * <br>
+ * Parameters of channel are mutable but connected nodes could not be changed.
+ */
 public class Channel implements StringRepresentable {
     public enum Type {
         DUPLEX, HALFDUPLEX
     }
     private static double ERRORS_AMOUNT = 0.1;
 
-    private GraphNode fromNode;
-    private GraphNode toNode;
+    private final GraphNode fromNode;
+    private final GraphNode toNode;
     private int weight;
     private Type type;
     private double errors;
@@ -34,10 +41,8 @@ public class Channel implements StringRepresentable {
         return toNode;
     }
 
-    public void reverse() {
-        GraphNode tmp = fromNode;
-        fromNode = toNode;
-        toNode = tmp;
+    public Channel reversed() {
+        return new Channel(toNode, fromNode, weight, type, errors);
     }
 
     public int getWeight() {
@@ -69,6 +74,25 @@ public class Channel implements StringRepresentable {
         return toString();
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        Channel channel = (Channel) o;
+        return weight == channel.weight &&
+                Double.compare(errors, channel.errors) == 0 &&
+                Objects.equals(fromNode, channel.fromNode) &&
+                Objects.equals(toNode, channel.toNode) &&
+                type == channel.type;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(fromNode, toNode, weight, type, errors);
+    }
+
     // node1 <--> node2 (weight=7, errors=12%)
     @Override
     public String toString() {
@@ -87,7 +111,7 @@ public class Channel implements StringRepresentable {
                 .append(weight)
                 .append(", errors=")
                 .append(errors * 100)
-                .append(" %)");
+                .append("%)");
         return builder.toString();
     }
 }
