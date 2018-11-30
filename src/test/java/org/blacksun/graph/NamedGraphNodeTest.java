@@ -1,4 +1,4 @@
-package org.blacksun.base;
+package org.blacksun.graph;
 
 import org.blacksun.utils.Pair;
 import org.junit.Before;

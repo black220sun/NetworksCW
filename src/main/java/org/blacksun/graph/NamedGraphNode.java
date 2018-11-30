@@ -1,10 +1,11 @@
-package org.blacksun.base;
+package org.blacksun.graph;
 
 import org.blacksun.utils.Pair;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class NamedGraphNode implements GraphNode {
@@ -44,16 +45,18 @@ public class NamedGraphNode implements GraphNode {
     }
 
     @Override
-    public void addConnection(@NotNull Channel channel) {
+    public Channel addConnection(@NotNull Channel channel) {
         connections.add(channel);
+        return channel;
     }
 
     @Override
-    public void addConnectedNode(@NotNull GraphNode node, int weight) {
+    public Channel addConnectedNode(@NotNull GraphNode node, int weight) {
         Channel channel = new Channel(this, node, weight);
         connections.add(channel);
         // Type.DUPLEX by default
         node.addConnection(channel.reversed());
+        return channel;
     }
 
     @Override
@@ -87,6 +90,22 @@ public class NamedGraphNode implements GraphNode {
                 .append("\n"));
         sb.append("]");
         return sb.toString();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        NamedGraphNode that = (NamedGraphNode) o;
+        return Objects.equals(name, that.name) &&
+                toString().equals(that.toString()); // && Objects.equals(connections, that.connections);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, toString()); //, connections);
     }
 
     @Override

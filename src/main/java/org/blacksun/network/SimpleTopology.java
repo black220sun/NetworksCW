@@ -1,5 +1,7 @@
-package org.blacksun.base;
+package org.blacksun.network;
 
+import org.blacksun.graph.GraphNode;
+import org.blacksun.graph.GraphNodeFactory;
 import org.blacksun.utils.RandomGenerator;
 import org.blacksun.utils.WeightList;
 import org.jetbrains.annotations.NotNull;
@@ -12,8 +14,11 @@ public class SimpleTopology implements Topology {
     private final int order;
     private final int lower;
     private final WeightList weights;
+    @NotNull
+    private final GraphNodeFactory factory;
 
-    public SimpleTopology(int amount, double order, @NotNull WeightList weights) {
+    public SimpleTopology(int amount, double order,
+                          @NotNull WeightList weights, @NotNull GraphNodeFactory factory) {
         if (amount < 0)
             throw new IllegalArgumentException("Amount must be non-negative");
         if (order <= 0)
@@ -22,6 +27,7 @@ public class SimpleTopology implements Topology {
         this.order = (int) (order * 1.75);
         lower = this.order > 1 ? 1 : 0;
         this.weights = weights;
+        this.factory = factory;
     }
 
     @Override
@@ -29,8 +35,7 @@ public class SimpleTopology implements Topology {
         List<GraphNode> nodes = new ArrayList<>();
         // create all nodes
         for (int i = 0; i < amount; ++i) {
-            // TODO(extract interface)
-            nodes.add(new NamedGraphNode("Node" + i));
+            nodes.add(factory.createNode());
         }
         RandomGenerator orderGen = new RandomGenerator(order, lower);
         RandomGenerator indexGen = new RandomGenerator(amount);

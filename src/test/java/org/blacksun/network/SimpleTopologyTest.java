@@ -1,13 +1,11 @@
-package org.blacksun.base;
+package org.blacksun.network;
 
+import org.blacksun.graph.NamedGraphNodeFactory;
 import org.blacksun.utils.WeightList;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.ArrayList;
-import java.util.stream.Collectors;
 import java.util.stream.DoubleStream;
-import java.util.stream.Stream;
 
 import static org.junit.Assert.*;
 
@@ -18,7 +16,7 @@ public class SimpleTopologyTest {
 
     @Before
     public void init() {
-        topology = new SimpleTopology(NODES, ORDER, new WeightList(1));
+        topology = new SimpleTopology(NODES, ORDER, new WeightList(1), new NamedGraphNodeFactory());
     }
 
     @Test

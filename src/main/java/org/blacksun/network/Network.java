@@ -1,5 +1,6 @@
-package org.blacksun.base;
+package org.blacksun.network;
 
+import org.blacksun.graph.GraphNode;
 import org.blacksun.utils.StringRepresentable;
 import org.jetbrains.annotations.NotNull;
 

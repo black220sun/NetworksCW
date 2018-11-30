@@ -1,4 +1,4 @@
-package org.blacksun.base;
+package org.blacksun.graph;
 
 import org.blacksun.utils.Pair;
 import org.blacksun.utils.StringRepresentable;
@@ -11,8 +11,8 @@ public interface GraphNode extends StringRepresentable {
     // returns list or connected nodes with the weight of connection
     List<Pair<GraphNode, Integer>> getConnections();
     boolean isConnected(@NotNull GraphNode node);
-    void addConnectedNode(@NotNull GraphNode node, int weight);
-    void addConnection(@NotNull Channel channel);
+    Channel addConnectedNode(@NotNull GraphNode node, int weight);
+    Channel addConnection(@NotNull Channel channel);
     void removeConnectedNode(@NotNull GraphNode node);
     void removeConnection(@NotNull Channel channel);
     int getOrder();

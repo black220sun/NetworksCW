@@ -1,4 +1,4 @@
-package org.blacksun.base;
+package org.blacksun.graph;
 
 import org.blacksun.utils.StringRepresentable;
 
@@ -35,6 +35,10 @@ public class Channel implements StringRepresentable {
         this.weight = weight;
         this.type = type;
         this.errors = errors;
+    }
+
+    public GraphNode getFromNode() {
+        return fromNode;
     }
 
     public GraphNode getToNode() {
