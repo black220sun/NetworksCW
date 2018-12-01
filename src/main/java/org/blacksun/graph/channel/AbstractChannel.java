@@ -91,7 +91,11 @@ abstract class AbstractChannel implements Channel {
 
     @Override
     public String toString() {
-        return String.format("%s %s %s (weight=%d, errors=%.1f%%)",
-                fromNode, getDirection(), toNode, weight, errors * 100);
+        String busy = "";
+        if (isUsed()) {
+            busy = ", busy";
+        }
+        return String.format("%s %s %s (weight=%d, errors=%.1f%%%s)",
+                fromNode, getDirection(), toNode, weight, errors * 100, busy);
     }
 }

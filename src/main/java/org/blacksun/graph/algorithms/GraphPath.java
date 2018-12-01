@@ -70,14 +70,16 @@ public final class GraphPath implements Iterable<Channel> {
     public String toString() {
         if (!exists())
             return "";
+        if (links.isEmpty())
+            return "Access to self";
         StringBuilder base = new StringBuilder();
-        int size = getLength();
-        if (size > 0) {
-            base.append(links.get(0).getFromNode().toString());
-            if (size > 1) {
-                base.append(" --> ");
-            }
-        }
+        base.append("GraphPath[length=")
+                .append(getLength())
+                .append(", weight=")
+                .append(getWeight())
+                .append("]:\n\t")
+                .append(links.get(0).getFromNode())
+                .append(" --> ");
         return base + links.stream()
                 .map(Channel::getToNode)
                 .map(Object::toString)
