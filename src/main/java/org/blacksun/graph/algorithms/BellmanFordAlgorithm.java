@@ -79,7 +79,7 @@ public class BellmanFordAlgorithm implements PathFindingAlgorithm {
         computePaths(node);
         map.forEach((pair, weight) -> {
             GraphNode key = pair.getFirst();
-            Integer old = map.get(key);
+            Integer old = result.get(key);
             if (old == null || old > weight) {
                 result.put(key, weight);
             }

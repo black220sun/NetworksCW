@@ -2,7 +2,6 @@ package org.blacksun.graph.node;
 
 import org.blacksun.graph.channel.Channel;
 import org.blacksun.graph.channel.ChannelFactory;
-import org.blacksun.utils.Pair;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -37,10 +36,8 @@ public class NamedGraphNode implements GraphNode {
     }
 
     @Override
-    public List<Pair<GraphNode, Integer>> getConnections() {
-        return connections.stream()
-                .map(ch -> new Pair<>(ch.getToNode(), ch.getWeight()))
-                .collect(Collectors.toList());
+    public List<Channel> getConnections() {
+        return connections;
     }
 
     @Override

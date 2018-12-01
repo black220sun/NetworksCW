@@ -10,7 +10,7 @@ import java.util.List;
 public interface GraphNode extends StringRepresentable {
     List<GraphNode> getConnectedNodes();
     // returns list or connected nodes with the weight of connection
-    List<Pair<GraphNode, Integer>> getConnections();
+    List<Channel> getConnections();
     boolean isConnected(@NotNull GraphNode node);
     Channel getConnection(@NotNull GraphNode node);
     Channel addConnectedNode(@NotNull GraphNode node, int weight);

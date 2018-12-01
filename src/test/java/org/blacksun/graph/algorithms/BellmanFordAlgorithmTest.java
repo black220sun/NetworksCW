@@ -1,12 +1,11 @@
 package org.blacksun.graph.algorithms;
 
 import org.blacksun.graph.channel.Channel;
+import org.blacksun.graph.channel.DuplexChannelFactory;
 import org.blacksun.graph.node.GraphNode;
 import org.blacksun.graph.node.NamedGraphNodeFactory;
-import org.blacksun.graph.channel.SimplexChannelFactory;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,13 +14,12 @@ import java.util.Iterator;
 import static org.junit.Assert.*;
 
 public class BellmanFordAlgorithmTest {
-    private static BellmanFordAlgorithm algorithm;
+    private static PathFindingAlgorithm algorithm;
     private static ArrayList<GraphNode> nodes = new ArrayList<>();
-    private static ArrayList<Channel> links = new ArrayList<>();
 
     @BeforeClass
     public static void init() {
-        NamedGraphNodeFactory factory = new NamedGraphNodeFactory("Node", new SimplexChannelFactory());
+        NamedGraphNodeFactory factory = new NamedGraphNodeFactory("Node", new DuplexChannelFactory());
         for (int i = 0; i < 9; ++i)
             nodes.add(factory.createNode());
         connect(0, 1, 3);
@@ -34,12 +32,11 @@ public class BellmanFordAlgorithmTest {
         connect(4, 5, 2);
         connect(5, 6, 3);
         connect(5, 7, 4);
-        algorithm = new BellmanFordAlgorithm(nodes, links);
+        algorithm = new BFAlgorithmFactory().getAlgorithm(nodes);
     }
 
     private static void connect(int from, int to, int weight) {
-        links.add(nodes.get(from).addConnectedNode(nodes.get(to), weight));
-        links.add(nodes.get(to).addConnectedNode(nodes.get(from), weight));
+        nodes.get(from).addConnectedNode(nodes.get(to), weight);
     }
 
     private GraphNode node(int index) {

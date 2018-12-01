@@ -1,5 +1,6 @@
 package org.blacksun.graph.node;
 
+import org.blacksun.graph.channel.Channel;
 import org.blacksun.graph.channel.ChannelFactory;
 import org.blacksun.graph.channel.DuplexChannelFactory;
 import org.blacksun.utils.Pair;
@@ -42,15 +43,16 @@ public class NamedGraphNodeTest {
         node.addConnectedNode(node2, 2);
         node.addConnectedNode(node2, 5);
 
-        ArrayList<Pair<GraphNode, Integer>> expected = new ArrayList<>();
-        expected.add(new Pair<>(node2, 2));
-        expected.add(new Pair<>(node2, 3));
-        expected.add(new Pair<>(node2, 5));
-        Iterator<Pair<GraphNode, Integer>> it = expected.stream().iterator();
+        ArrayList<Integer> expected = new ArrayList<>();
+        expected.add(2);
+        expected.add(3);
+        expected.add(5);
+        Iterator<Integer> it = expected.stream().iterator();
 
         node.getConnections().stream()
-                .sorted(Comparator.comparing(Pair::getSecond))
-                .forEach(pair -> assertEquals(it.next(), pair));
+                .sorted(Comparator.comparing(Channel::getWeight))
+                .map(Channel::getWeight)
+                .forEach(weight -> assertEquals(it.next(), weight));
     }
 
     //TODO(more nodes?)
