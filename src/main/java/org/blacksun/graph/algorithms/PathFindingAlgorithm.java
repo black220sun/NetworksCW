@@ -1,6 +1,6 @@
 package org.blacksun.graph.algorithms;
 
-import org.blacksun.graph.GraphNode;
+import org.blacksun.graph.node.GraphNode;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;

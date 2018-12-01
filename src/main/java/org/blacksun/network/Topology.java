@@ -1,6 +1,6 @@
 package org.blacksun.network;
 
-import org.blacksun.graph.GraphNode;
+import org.blacksun.graph.node.GraphNode;
 
 import java.util.List;
 

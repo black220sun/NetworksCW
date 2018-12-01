@@ -1,5 +1,6 @@
-package org.blacksun.graph;
+package org.blacksun.graph.node;
 
+import org.blacksun.graph.channel.Channel;
 import org.blacksun.utils.Pair;
 import org.blacksun.utils.StringRepresentable;
 import org.jetbrains.annotations.NotNull;

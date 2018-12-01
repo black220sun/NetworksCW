@@ -1,4 +1,4 @@
-package org.blacksun.graph;
+package org.blacksun.graph.node;
 
 public interface GraphNodeFactory {
     GraphNode createNode();

@@ -1,7 +1,7 @@
 package org.blacksun.graph.algorithms;
 
-import org.blacksun.graph.Channel;
-import org.blacksun.graph.GraphNode;
+import org.blacksun.graph.channel.Channel;
+import org.blacksun.graph.node.GraphNode;
 import org.blacksun.utils.Pair;
 import org.jetbrains.annotations.NotNull;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
@@ -63,7 +63,7 @@ public class BellmanFordAlgorithm implements PathFindingAlgorithm {
                 .stream()
                 .filter(pair -> pair.getFirst().equals(to))
                 .min(Comparator.comparingInt(map::get))
-                .get();
+                .orElseThrow(() -> new RuntimeException("Empty graph detected"));
         return map.get(key);
     }
 

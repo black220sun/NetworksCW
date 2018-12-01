@@ -1,6 +1,6 @@
 package org.blacksun;
 
-import org.blacksun.graph.NamedGraphNodeFactory;
+import org.blacksun.graph.node.NamedGraphNodeFactory;
 import org.blacksun.network.Network;
 import org.blacksun.network.SimpleTopology;
 import org.blacksun.utils.WeightList;

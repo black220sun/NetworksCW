@@ -1,6 +1,6 @@
 package org.blacksun.graph.algorithms;
 
-import org.blacksun.graph.Channel;
+import org.blacksun.graph.channel.Channel;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;

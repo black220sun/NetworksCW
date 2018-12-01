@@ -1,5 +1,7 @@
-package org.blacksun.graph;
+package org.blacksun.graph.node;
 
+import org.blacksun.graph.channel.Channel;
+import org.blacksun.graph.channel.ChannelFactory;
 import org.blacksun.utils.Pair;
 import org.jetbrains.annotations.NotNull;
 
@@ -10,10 +12,12 @@ import java.util.stream.Collectors;
 
 public class NamedGraphNode implements GraphNode {
     private String name;
+    private final ChannelFactory factory;
     protected List<Channel> connections;
 
-    public NamedGraphNode(@NotNull String name) {
+    NamedGraphNode(@NotNull String name, @NotNull ChannelFactory factory) {
         this.name = name;
+        this.factory = factory;
         connections = new ArrayList<>();
     }
 
@@ -52,10 +56,8 @@ public class NamedGraphNode implements GraphNode {
 
     @Override
     public Channel addConnectedNode(@NotNull GraphNode node, int weight) {
-        Channel channel = new Channel(this, node, weight);
-        connections.add(channel);
-        // Type.DUPLEX by default
-        node.addConnection(channel.reversed());
+        Channel channel = factory.createChannel(this, node, weight);
+        channel.connect();
         return channel;
     }
 
@@ -68,12 +70,7 @@ public class NamedGraphNode implements GraphNode {
     public void removeConnectedNode(@NotNull GraphNode node) {
         connections.stream()
                 .filter(ch -> ch.getToNode().equals(node))
-                .findAny().ifPresent(ch -> {
-                    connections.remove(ch);
-                    if (ch.getType().equals(Channel.Type.DUPLEX)) {
-                        ch.getToNode().removeConnection(ch.reversed());
-                    }
-                });
+                .findAny().ifPresent(Channel::remove);
     }
 
     @Override

@@ -1,6 +1,6 @@
 package org.blacksun.network;
 
-import org.blacksun.graph.GraphNode;
+import org.blacksun.graph.node.GraphNode;
 import org.blacksun.utils.StringRepresentable;
 import org.jetbrains.annotations.NotNull;
 

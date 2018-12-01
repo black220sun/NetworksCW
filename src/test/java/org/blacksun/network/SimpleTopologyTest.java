@@ -1,6 +1,6 @@
 package org.blacksun.network;
 
-import org.blacksun.graph.NamedGraphNodeFactory;
+import org.blacksun.graph.node.NamedGraphNodeFactory;
 import org.blacksun.utils.WeightList;
 import org.junit.Before;
 import org.junit.Test;

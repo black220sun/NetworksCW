@@ -1,5 +1,7 @@
-package org.blacksun.graph;
+package org.blacksun.graph.node;
 
+import org.blacksun.graph.channel.ChannelFactory;
+import org.blacksun.graph.channel.DuplexChannelFactory;
 import org.blacksun.utils.Pair;
 import org.junit.Before;
 import org.junit.Test;
@@ -17,8 +19,9 @@ public class NamedGraphNodeTest {
 
     @Before
     public void init() {
-        node = new NamedGraphNode("Test node");
-        node2 = new NamedGraphNode("Tmp node");
+        ChannelFactory factory = new DuplexChannelFactory();
+        node = new NamedGraphNode("Test node", factory);
+        node2 = new NamedGraphNode("Tmp node", factory);
     }
 
     @Test
@@ -98,7 +101,7 @@ public class NamedGraphNodeTest {
         node.addConnectedNode(node2, 7);
 
         String expected = "Test node [\n\t"
-                + node + " <--> " + node2
+                + node + " <==> " + node2
                 + " (weight=7, errors=10.0%)\n]";
         assertEquals(expected, node.stringRepresentation());
     }

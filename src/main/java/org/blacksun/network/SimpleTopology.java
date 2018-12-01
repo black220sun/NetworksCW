@@ -1,7 +1,7 @@
 package org.blacksun.network;
 
-import org.blacksun.graph.GraphNode;
-import org.blacksun.graph.GraphNodeFactory;
+import org.blacksun.graph.node.GraphNode;
+import org.blacksun.graph.node.GraphNodeFactory;
 import org.blacksun.utils.RandomGenerator;
 import org.blacksun.utils.WeightList;
 import org.jetbrains.annotations.NotNull;
