@@ -4,7 +4,6 @@ import org.blacksun.graph.channel.Channel;
 import org.blacksun.graph.node.GraphNode;
 import org.blacksun.utils.Pair;
 import org.jetbrains.annotations.NotNull;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.util.Comparator;
 import java.util.HashMap;
@@ -13,14 +12,17 @@ import java.util.List;
 public class BellmanFordAlgorithm implements PathFindingAlgorithm {
     private final List<GraphNode> nodes;
     private final List<Channel> links;
+    private HashMap<Pair<GraphNode, Integer>, Integer> map;
+    private HashMap<Pair<GraphNode, Integer>, GraphNode> pathMap;
 
     public BellmanFordAlgorithm(@NotNull List<GraphNode> nodes, @NotNull List<Channel> links) {
         this.nodes = nodes;
         this.links = links;
     }
 
-    private HashMap<Pair<GraphNode, Integer>, Integer> computePaths(@NotNull GraphNode from) {
-        HashMap<Pair<GraphNode, Integer>, Integer> map = new HashMap<>();
+    private void computePaths(@NotNull GraphNode from) {
+        map = new HashMap<>();
+        pathMap = new HashMap<>();
         int size = nodes.size();
         for (GraphNode node : nodes) {
             for (int i = 0; i < size; ++i) {
@@ -31,24 +33,25 @@ public class BellmanFordAlgorithm implements PathFindingAlgorithm {
         for (int i = 1; i < size; ++i) {
             for (Channel channel : links) {
                 Pair<GraphNode, Integer> vi = new Pair<>(channel.getToNode(), i);
-                Pair<GraphNode, Integer> ui = new Pair<>(channel.getFromNode(), i - 1);
+                GraphNode fromNode = channel.getFromNode();
+                Pair<GraphNode, Integer> ui = new Pair<>(fromNode, i - 1);
                 Integer oldWeight = map.get(ui);
                 if (oldWeight.equals(INFINITY))
                     continue;
                 int newWeight = oldWeight + channel.getWeight();
                 if (map.get(vi) > newWeight) {
                     map.put(vi, newWeight);
+                    pathMap.put(vi, fromNode);
                 }
             }
         }
-        return map;
     }
 
     @Override
     public boolean isAccessible(@NotNull GraphNode from, @NotNull GraphNode to) {
         if (!nodes.contains(from) || !nodes.contains(to))
             return false;
-        HashMap<Pair<GraphNode, Integer>, Integer> map = computePaths(from);
+        computePaths(from);
         return map.keySet()
                 .stream()
                 .anyMatch(pair -> pair.getFirst().equals(to) && !map.get(pair).equals(INFINITY));
@@ -58,26 +61,30 @@ public class BellmanFordAlgorithm implements PathFindingAlgorithm {
     public int getMinDistance(@NotNull GraphNode from, @NotNull GraphNode to) {
         if (!nodes.contains(from) || !nodes.contains(to))
             return INFINITY;
-        HashMap<Pair<GraphNode, Integer>, Integer> map = computePaths(from);
-        Pair<GraphNode, Integer> key = map.keySet()
+        computePaths(from);
+        return map.get(minKey(to));
+    }
+
+    private Pair<GraphNode, Integer> minKey(GraphNode to) {
+        return map.keySet()
                 .stream()
                 .filter(pair -> pair.getFirst().equals(to))
                 .min(Comparator.comparingInt(map::get))
                 .orElseThrow(() -> new RuntimeException("Empty graph detected"));
-        return map.get(key);
     }
 
     @Override
     public HashMap<GraphNode, Integer> getDistances(@NotNull GraphNode node) {
-        HashMap<GraphNode, Integer> map = new HashMap<>();
-        computePaths(node).forEach((pair, weight) -> {
+        HashMap<GraphNode, Integer> result = new HashMap<>();
+        computePaths(node);
+        map.forEach((pair, weight) -> {
             GraphNode key = pair.getFirst();
             Integer old = map.get(key);
             if (old == null || old > weight) {
-                map.put(key, weight);
+                result.put(key, weight);
             }
         });
-        return map;
+        return result;
     }
 
     @Override
@@ -85,6 +92,19 @@ public class BellmanFordAlgorithm implements PathFindingAlgorithm {
         GraphPath path = new GraphPath();
         if (!nodes.contains(from) || !nodes.contains(to))
             return path;
-        throw new NotImplementedException();
+        computePaths(from);
+        int size = minKey(to).getSecond();
+        GraphNode[] nodes = new GraphNode[size + 1];
+        for (int j = size; j > 0; --j) {
+            nodes[j] = to;
+            to = pathMap.get(new Pair<>(to, j));
+            if (to == null)
+                return path;
+        }
+        nodes[0] = from;
+        for (int i = 0; i < size; ++i) {
+            path.add(nodes[i].getConnection(nodes[i + 1]));
+        }
+        return path;
     }
 }

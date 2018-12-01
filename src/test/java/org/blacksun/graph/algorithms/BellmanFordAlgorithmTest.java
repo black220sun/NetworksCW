@@ -10,6 +10,7 @@ import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 
 import static org.junit.Assert.*;
 
@@ -86,9 +87,19 @@ public class BellmanFordAlgorithmTest {
         assertEquals(algorithm.INFINITY, map0.get(node(8)));
     }
 
-    @Test(expected = NotImplementedException.class)
+    @Test
     public void getPath() {
         assertFalse(algorithm.getPath(node(0), node(8)).exists());
-        assertTrue(algorithm.getPath(node(0), node(7)).exists());
+        GraphPath path = algorithm.getPath(node(0), node(7));
+        assertTrue(path.exists());
+        assertEquals(3, path.getLength());
+        assertEquals(8, path.getWeight());
+        Iterator<Channel> it = path.iterator();
+        Channel first = it.next();
+        assertEquals(node(0), first.getFromNode());
+        assertEquals(node(1), first.getToNode());
+        assertEquals(node(3), it.next().getToNode());
+        assertEquals(node(7), it.next().getToNode());
+        assertFalse(it.hasNext());
     }
 }

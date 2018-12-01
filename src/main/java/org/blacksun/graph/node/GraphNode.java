@@ -12,6 +12,7 @@ public interface GraphNode extends StringRepresentable {
     // returns list or connected nodes with the weight of connection
     List<Pair<GraphNode, Integer>> getConnections();
     boolean isConnected(@NotNull GraphNode node);
+    Channel getConnection(@NotNull GraphNode node);
     Channel addConnectedNode(@NotNull GraphNode node, int weight);
     Channel addConnection(@NotNull Channel channel);
     void removeConnectedNode(@NotNull GraphNode node);

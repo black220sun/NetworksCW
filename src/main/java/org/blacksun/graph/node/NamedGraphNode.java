@@ -49,6 +49,14 @@ public class NamedGraphNode implements GraphNode {
     }
 
     @Override
+    public Channel getConnection(@NotNull GraphNode node) {
+        return connections.stream()
+                .filter(ch -> ch.getToNode().equals(node))
+                .findAny()
+                .orElseThrow(() -> new RuntimeException(node + " is not connected"));
+    }
+
+    @Override
     public Channel addConnection(@NotNull Channel channel) {
         connections.add(channel);
         return channel;
@@ -70,7 +78,8 @@ public class NamedGraphNode implements GraphNode {
     public void removeConnectedNode(@NotNull GraphNode node) {
         connections.stream()
                 .filter(ch -> ch.getToNode().equals(node))
-                .findAny().ifPresent(Channel::remove);
+                .findAny()
+                .ifPresent(Channel::remove);
     }
 
     @Override
