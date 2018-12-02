@@ -21,6 +21,7 @@ public class NetworkPanel extends JScrollPane {
 
     public void update() {
         render.update();
+        revalidate();
     }
 
     public Network getNetwork() {

@@ -1,5 +1,7 @@
 package org.blacksun.view;
 
+import guru.nidi.graphviz.attribute.Color;
+
 public class Config {
     private static Config cfg = new Config();
     private int frameWidth = 2000;
@@ -9,6 +11,11 @@ public class Config {
     private boolean resizeGraph = true;
     private int graphWidth = viewWidth - 100;
     private int graphHeight = viewHeight - 100;
+    private Color nodeColor = Color.BLACK;
+    private Color selectedNodeColor = Color.BLUE;
+    private Color channelColor = Color.BLACK;
+    private Color selectedChannelColor = Color.BLUE;
+    private Color connectedChannelColor = Color.RED;
 
     private Config() {
     }
@@ -67,6 +74,46 @@ public class Config {
 
     public void setGraphHeight(int graphHeight) {
         this.graphHeight = graphHeight;
+    }
+
+    public Color getNodeColor() {
+        return nodeColor;
+    }
+
+    public void setNodeColor(Color nodeColor) {
+        this.nodeColor = nodeColor;
+    }
+
+    public Color getSelectedNodeColor() {
+        return selectedNodeColor;
+    }
+
+    public void setSelectedNodeColor(Color selectedNodeColor) {
+        this.selectedNodeColor = selectedNodeColor;
+    }
+
+    public Color getChannelColor() {
+        return channelColor;
+    }
+
+    public void setChannelColor(Color channelColor) {
+        this.channelColor = channelColor;
+    }
+
+    public Color getSelectedChannelColor() {
+        return selectedChannelColor;
+    }
+
+    public void setSelectedChannelColor(Color selectedChannelColor) {
+        this.selectedChannelColor = selectedChannelColor;
+    }
+
+    public Color getConnectedChannelColor() {
+        return connectedChannelColor;
+    }
+
+    public void setConnectedChannelColor(Color connectedChannelColor) {
+        this.connectedChannelColor = connectedChannelColor;
     }
 
     public static Config getConfig() {

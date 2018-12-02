@@ -9,6 +9,7 @@ import org.blacksun.graph.algorithms.GraphPath;
 import org.blacksun.graph.algorithms.PathFindingAlgorithmFactory;
 import org.blacksun.graph.node.GraphNode;
 import org.blacksun.utils.StringRepresentable;
+import org.blacksun.view.Config;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -132,13 +133,14 @@ public class Network implements StringRepresentable {
     }
 
     public MutableGraph toGraph() {
+        Config cfg = Config.getConfig();
         HashMap<GraphNode, MutableNode> map = new HashMap<>();
         MutableGraph g = mutGraph("network")
                 .setDirected(true);
         nodes.forEach(node -> {
-            Color color = Color.BLACK;
+            Color color = cfg.getNodeColor();
             if (node.isSelected())
-                color = Color.GREEN;
+                color = cfg.getSelectedNodeColor();
             map.put(node, mutNode(node.toString()).add(color));
         });
         nodes.forEach(node -> {
@@ -146,11 +148,11 @@ public class Network implements StringRepresentable {
             g.add(mNode);
             node.getConnections().forEach(ch -> {
                 MutableNode toNode = map.get(ch.getToNode());
-                Color color = Color.BLACK;
+                Color color = cfg.getChannelColor();
                 if (ch.isUsed())
-                    color = Color.RED;
-                else if (ch.isSelected())
-                    color = Color.GREEN;
+                    color = cfg.getConnectedChannelColor();
+                if (ch.isSelected())
+                    color = cfg.getSelectedChannelColor();
                 mNode.addLink(to(toNode).
                         with(Label.markdown(String.valueOf(ch.getWeight())),
                                 color));

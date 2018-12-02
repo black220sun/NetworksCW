@@ -15,8 +15,6 @@ class NetworkRender extends JPanel {
         super();
         this.network = network;
         update();
-        setPreferredSize(new Dimension(networkImage.getWidth(this),
-                networkImage.getHeight(this)));
     }
 
     void update() {
@@ -28,7 +26,10 @@ class NetworkRender extends JPanel {
             networkImage = networkImage.getScaledInstance(cfg.getGraphWidth(),
                     cfg.getGraphHeight(), Image.SCALE_SMOOTH);
         }
+        setPreferredSize(new Dimension(networkImage.getWidth(this),
+                networkImage.getHeight(this)));
         repaint();
+        revalidate();
     }
 
     @Override

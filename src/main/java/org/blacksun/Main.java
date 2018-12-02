@@ -10,6 +10,7 @@ import org.blacksun.network.Network;
 import org.blacksun.network.SimpleTopology;
 import org.blacksun.network.Topology;
 import org.blacksun.utils.WeightList;
+import org.blacksun.view.Config;
 import org.blacksun.view.MainFrame;
 
 import java.io.IOException;
@@ -19,7 +20,10 @@ import java.util.logging.SimpleFormatter;
 
 public class Main {
     public static void main(String[] args) throws IOException {
-        initLogger();
+        //initLogger();
+
+        /* change options before creating frame */
+        // Config cfg = Config.getConfig();
         new MainFrame(initNetwork());
     }
 
