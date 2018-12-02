@@ -18,11 +18,22 @@ import static guru.nidi.graphviz.model.Factory.*;
 
 public class Network implements StringRepresentable {
     private List<GraphNode> nodes;
+    private final Topology topology;
     private PathFindingAlgorithmFactory factory;
     private List<GraphPath> openConnections;
 
     public Network() {
-        this(ArrayList::new);
+        this(new Topology() {
+            @Override
+            public List<GraphNode> createNetwork() {
+                return new ArrayList<>();
+            }
+
+            @Override
+            public GraphNode createNode() {
+                return null;
+            }
+        });
     }
 
     public Network(@NotNull Topology topology) {
@@ -31,6 +42,7 @@ public class Network implements StringRepresentable {
 
     public Network(@NotNull Topology topology, PathFindingAlgorithmFactory factory) {
         nodes = topology.createNetwork();
+        this.topology = topology;
         this.factory = factory;
         openConnections = new ArrayList<>();
     }
@@ -83,6 +95,14 @@ public class Network implements StringRepresentable {
                 .ifPresent(this::closeConnection);
     }
 
+    public GraphNode addNode() {
+        GraphNode node = topology.createNode();
+        if (node != null) {
+            nodes.add(node);
+        }
+        return node;
+    }
+
     public void addNode(@NotNull GraphNode node) {
         if (!exists(node)) {
             nodes.add(node);
@@ -90,6 +110,7 @@ public class Network implements StringRepresentable {
     }
 
     public void removeNode(@NotNull GraphNode node) {
+        node.getConnections().forEach(ch -> node.removeConnectedNode(ch.getToNode()));
         nodes.remove(node);
     }
 

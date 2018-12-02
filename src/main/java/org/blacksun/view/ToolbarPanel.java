@@ -1,6 +1,11 @@
 package org.blacksun.view;
 
+import org.blacksun.graph.channel.Channel;
+import org.blacksun.graph.channel.DuplexChannel;
+import org.blacksun.graph.channel.HalfDuplexChannel;
+import org.blacksun.graph.channel.SimplexChannel;
 import org.blacksun.graph.node.GraphNode;
+import org.blacksun.graph.node.NamedGraphNode;
 import org.blacksun.network.Network;
 
 import javax.swing.*;
@@ -24,9 +29,47 @@ public class ToolbarPanel extends JPanel {
         fromNode = new JComboBox<>(nodes);
         toNode = new JComboBox<>(nodes);
         text = new JTextField();
+        text.setPreferredSize(new Dimension(128, 24));
         addNodePanel();
+        add(text);
+        addChangePanel();
         addViewPanel();
         addGraphPanel();
+    }
+
+    private void addChangePanel() {
+        JPanel pane = new JPanel();
+        pane.setLayout(new BoxLayout(pane, BoxLayout.X_AXIS));
+        pane.add(createButton("Add", e -> {
+            GraphNode node = network.addNode();
+            fromNode.addItem(node);
+            toNode.addItem(node);
+            panel.update();
+        }));
+        pane.add(createButton("Remove", nodeAction((node, n) -> {
+            network.removeNode(node);
+            fromNode.removeItem(node);
+            toNode.removeItem(node);
+        })));
+        pane.add(createButton("Rename", nodeAction((node, n) -> {
+            String name = text.getText();
+            if (!name.isEmpty() && node instanceof NamedGraphNode) {
+                ((NamedGraphNode) node).setName(name);
+            }
+        })));
+        pane.add(createButton("Link", nodeAction((n1, n2) -> {
+            String name = text.getText().toLowerCase();
+            int weight = Config.getConfig().getWeightList().getWeight();
+            if (name.startsWith("duplex")) {
+                new DuplexChannel(n1, n2, weight, Channel.ERRORS_AMOUNT);
+            } else if (name.startsWith("half")) {
+                new HalfDuplexChannel(n1, n2, weight, Channel.ERRORS_AMOUNT);
+            } else {
+                new SimplexChannel(n1, n2, weight, Channel.ERRORS_AMOUNT);
+            }
+        })));
+        pane.add(createButton("Unlink", nodeAction(network::removeConnection)));
+        add(pane);
     }
 
     private void addGraphPanel() {
@@ -60,7 +103,6 @@ public class ToolbarPanel extends JPanel {
     private void addViewPanel() {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
-        panel.add(text);
         panel.add(createButton("Frame width", cfgAction(Config::setFrameWidth)));
         panel.add(createButton("Frame height", cfgAction(Config::setFrameHeight)));
         panel.add(createButton("View width", cfgAction(Config::setViewHeight)));

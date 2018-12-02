@@ -72,9 +72,7 @@ public class NamedGraphNode implements GraphNode {
 
     @Override
     public Channel addConnectedNode(@NotNull GraphNode node, int weight) {
-        Channel channel = factory.createChannel(this, node, weight);
-        channel.connect();
-        return channel;
+        return factory.createChannel(this, node, weight);
     }
 
     @Override

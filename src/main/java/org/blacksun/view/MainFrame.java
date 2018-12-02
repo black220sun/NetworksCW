@@ -19,7 +19,9 @@ public class MainFrame extends JFrame {
         JSplitPane pane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
         NetworkPanel networkPanel = new NetworkPanel(network);
         pane.setLeftComponent(networkPanel);
-        pane.setRightComponent(new ToolbarPanel(networkPanel));
+        JPanel panel = new JPanel();
+        panel.add(new ToolbarPanel(networkPanel));
+        pane.setRightComponent(panel);
         pane.setOneTouchExpandable(true);
         setContentPane(pane);
         setVisible(true);

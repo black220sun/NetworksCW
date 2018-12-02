@@ -1,6 +1,7 @@
 package org.blacksun.view;
 
 import guru.nidi.graphviz.attribute.Color;
+import org.blacksun.utils.WeightList;
 
 public class Config {
     private static Config cfg = new Config();
@@ -16,6 +17,7 @@ public class Config {
     private Color channelColor = Color.BLACK;
     private Color selectedChannelColor = Color.BLUE;
     private Color connectedChannelColor = Color.RED;
+    private WeightList weightList;
 
     private Config() {
     }
@@ -118,5 +120,13 @@ public class Config {
 
     public static Config getConfig() {
         return cfg;
+    }
+
+    public WeightList getWeightList() {
+        return weightList;
+    }
+
+    public void setWeightList(WeightList weightList) {
+        this.weightList = weightList;
     }
 }

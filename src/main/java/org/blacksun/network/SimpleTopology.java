@@ -58,4 +58,9 @@ public class SimpleTopology implements Topology {
         }
         return nodes;
     }
+
+    @Override
+    public GraphNode createNode() {
+        return factory.createNode();
+    }
 }

@@ -29,6 +29,7 @@ public class Main {
 
     private static Network initNetwork() {
         WeightList weights = new WeightList(2, 3, 5, 7, 12);
+        Config.getConfig().setWeightList(weights);
         ChannelFactory channelFactory = new HalfDuplexChannelFactory();
         GraphNodeFactory nodeFactory = new SimpleNodeFactory("Node", channelFactory);
         Topology topology = new SimpleTopology(30, 3, weights, nodeFactory);
