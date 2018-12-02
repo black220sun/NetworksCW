@@ -64,8 +64,10 @@ public class ToolbarPanel extends JPanel {
                 new DuplexChannel(n1, n2, weight, Channel.ERRORS_AMOUNT);
             } else if (name.startsWith("half")) {
                 new HalfDuplexChannel(n1, n2, weight, Channel.ERRORS_AMOUNT);
-            } else {
+            } else if (name.startsWith("simplex")) {
                 new SimplexChannel(n1, n2, weight, Channel.ERRORS_AMOUNT);
+            } else { // use default channel
+                n1.addConnectedNode(n2, weight);
             }
         })));
         pane.add(createButton("Unlink", nodeAction(network::removeConnection)));
