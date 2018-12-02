@@ -1,8 +1,8 @@
 package org.blacksun.network;
 
+import guru.nidi.graphviz.model.MutableGraph;
 import org.blacksun.graph.algorithms.GraphPath;
 import org.blacksun.graph.node.GraphNode;
-import org.blacksun.utils.RandomGenerator;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -21,6 +21,10 @@ public class NetworkSummary {
 
     public void dumpNetwork() {
         logger.info(network.stringRepresentation());
+    }
+
+    public MutableGraph dumpGraph() {
+        return network.toGraph();
     }
 
     public GraphPath createConnection(boolean close) {

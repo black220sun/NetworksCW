@@ -1,6 +1,7 @@
 package org.blacksun.graph.algorithms;
 
 import org.blacksun.graph.channel.Channel;
+import org.blacksun.graph.node.GraphNode;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -84,5 +85,14 @@ public final class GraphPath implements Iterable<Channel> {
                 .map(Channel::getToNode)
                 .map(Object::toString)
                 .collect(Collectors.joining(" --> "));
+    }
+
+    public boolean ofNodes(GraphNode from, GraphNode to) {
+        if (from == to && cycle)
+            return true;
+        if (links.isEmpty())
+            return false;
+        return links.get(0).getFromNode().equals(from) &&
+                links.get(links.size() - 1).getToNode().equals(to);
     }
 }

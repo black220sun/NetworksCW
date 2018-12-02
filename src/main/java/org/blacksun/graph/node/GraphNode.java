@@ -1,13 +1,13 @@
 package org.blacksun.graph.node;
 
 import org.blacksun.graph.channel.Channel;
-import org.blacksun.utils.Pair;
+import org.blacksun.utils.Selectable;
 import org.blacksun.utils.StringRepresentable;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-public interface GraphNode extends StringRepresentable {
+public interface GraphNode extends StringRepresentable, Selectable {
     List<GraphNode> getConnectedNodes();
     // returns list or connected nodes with the weight of connection
     List<Channel> getConnections();

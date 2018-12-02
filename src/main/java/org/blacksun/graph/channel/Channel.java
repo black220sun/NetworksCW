@@ -1,6 +1,7 @@
 package org.blacksun.graph.channel;
 
 import org.blacksun.graph.node.GraphNode;
+import org.blacksun.utils.Selectable;
 import org.blacksun.utils.StringRepresentable;
 
 /**
@@ -8,7 +9,7 @@ import org.blacksun.utils.StringRepresentable;
  * <br>
  * Parameters of channel are mutable but connected nodes could not be changed.
  */
-public interface Channel extends StringRepresentable {
+public interface Channel extends StringRepresentable, Selectable {
     double ERRORS_AMOUNT = 0.1;
 
     GraphNode getFromNode();

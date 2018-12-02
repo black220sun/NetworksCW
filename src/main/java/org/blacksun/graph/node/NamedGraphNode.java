@@ -12,7 +12,8 @@ import java.util.stream.Collectors;
 public class NamedGraphNode implements GraphNode {
     private String name;
     private final ChannelFactory factory;
-    protected List<Channel> connections;
+    private List<Channel> connections;
+    private boolean selected;
 
     NamedGraphNode(@NotNull String name, @NotNull ChannelFactory factory) {
         this.name = name;
@@ -26,6 +27,16 @@ public class NamedGraphNode implements GraphNode {
 
     public void setName(@NotNull String name) {
         this.name = name;
+    }
+
+    @Override
+    public boolean isSelected() {
+        return selected;
+    }
+
+    @Override
+    public void setSelected(boolean selected) {
+        this.selected = selected;
     }
 
     @Override

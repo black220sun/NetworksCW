@@ -5,9 +5,9 @@ import org.blacksun.graph.channel.DuplexChannelFactory;
 import org.jetbrains.annotations.NotNull;
 
 public class NamedGraphNodeFactory implements GraphNodeFactory {
-    private final String name;
-    private final ChannelFactory factory;
-    private int nodesCounter;
+    protected final String name;
+    protected final ChannelFactory factory;
+    protected int nodesCounter;
 
     public NamedGraphNodeFactory() {
         this("Node");

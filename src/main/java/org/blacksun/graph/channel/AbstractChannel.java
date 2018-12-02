@@ -11,6 +11,7 @@ abstract class AbstractChannel implements Channel {
     protected boolean used;
     protected int weight;
     protected double errors;
+    private boolean selected;
 
     public AbstractChannel(@NotNull GraphNode fromNode, @NotNull GraphNode toNode, int weight, double errors) {
         this.fromNode = fromNode;
@@ -60,6 +61,16 @@ abstract class AbstractChannel implements Channel {
     @Override
     public boolean isUsed() {
         return used;
+    }
+
+    @Override
+    public void setSelected(boolean selected) {
+        this.selected = selected;
+    }
+
+    @Override
+    public boolean isSelected() {
+        return selected;
     }
 
     @Override
