@@ -6,12 +6,12 @@ import org.blacksun.utils.WeightList;
 public class Config {
     private static Config cfg = new Config();
     private int frameWidth = 2000;
-    private int frameHeight = 1200;
+    private int frameHeight = 1050;
     private int viewWidth = 1400;
     private int viewHeight = frameHeight;
     private boolean resizeGraph = true;
-    private int graphWidth = viewWidth - 100;
-    private int graphHeight = viewHeight - 100;
+    private int graphWidth = viewWidth - 20;
+    private int graphHeight = viewHeight - 70;
     private Color nodeColor = Color.BLACK;
     private Color selectedNodeColor = Color.BLUE;
     private Color channelColor = Color.BLACK;

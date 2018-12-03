@@ -10,6 +10,8 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.junit.Assert.*;
 
@@ -32,11 +34,19 @@ public class BellmanFordAlgorithmTest {
         connect(4, 5, 2);
         connect(5, 6, 3);
         connect(5, 7, 4);
-        algorithm = new BFAlgorithmFactory().getAlgorithm(nodes);
+        algorithm = new BFAlgorithmFactory().getAlgorithm(nodes, getLinks(nodes));
     }
 
     private static void connect(int from, int to, int weight) {
         nodes.get(from).addConnectedNode(nodes.get(to), weight);
+    }
+
+    private static List<Channel> getLinks(ArrayList<GraphNode> nodes) {
+        return nodes.stream()
+                .flatMap(node -> node.getConnections().stream())
+                .distinct()
+                .filter(ch -> !ch.isUsed())
+                .collect(Collectors.toList());
     }
 
     private GraphNode node(int index) {

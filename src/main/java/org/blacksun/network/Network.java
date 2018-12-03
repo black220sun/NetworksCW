@@ -7,12 +7,14 @@ import guru.nidi.graphviz.model.MutableNode;
 import org.blacksun.graph.algorithms.BFAlgorithmFactory;
 import org.blacksun.graph.algorithms.GraphPath;
 import org.blacksun.graph.algorithms.PathFindingAlgorithmFactory;
+import org.blacksun.graph.channel.Channel;
 import org.blacksun.graph.node.GraphNode;
 import org.blacksun.utils.StringRepresentable;
 import org.blacksun.view.Config;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static guru.nidi.graphviz.model.Factory.*;
 
@@ -64,9 +66,21 @@ public class Network implements StringRepresentable {
     }
 
     public GraphPath getPath(@NotNull GraphNode from, @NotNull GraphNode to) {
+        return getPath(from, to, false);
+    }
+
+    public GraphPath getPath(@NotNull GraphNode from, @NotNull GraphNode to, boolean isUsed) {
         if (!exists(from, to))
             return new GraphPath();
-        return factory.getAlgorithm(nodes).getPath(from, to);
+        return factory.getAlgorithm(nodes, getChannels(isUsed)).getPath(from, to);
+    }
+
+    private List<Channel> getChannels(boolean isUsed) {
+        return nodes.stream()
+                .flatMap(node -> node.getConnections().stream())
+                .distinct()
+                .filter(ch -> ch.isUsed() == isUsed)
+                .collect(Collectors.toList());
     }
 
     public GraphPath createConnection(@NotNull GraphNode from, @NotNull GraphNode to) {
@@ -185,5 +199,9 @@ public class Network implements StringRepresentable {
     @Override
     public String toString() {
         return "Network[nodes=" + nodes.size() + ", order=" + getAvgOrder() + "]";
+    }
+
+    public void closeAll() {
+        getChannels(true).forEach(ch -> ch.setUsed(false));
     }
 }

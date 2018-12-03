@@ -19,6 +19,8 @@ public class ToolbarPanel extends JPanel {
     private final JComboBox<GraphNode> fromNode;
     private final JComboBox<GraphNode> toNode;
     private final JTextField text;
+    private final JLabel timeLabel;
+    private int time;
 
     public ToolbarPanel(NetworkPanel panel) {
         super();
@@ -35,6 +37,24 @@ public class ToolbarPanel extends JPanel {
         addChangePanel();
         addViewPanel();
         addGraphPanel();
+        timeLabel = new JLabel("0");
+        addTimePanel();
+    }
+
+    private void addTimePanel() {
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+        panel.add(timeLabel);
+        panel.add(new JLabel("        "));
+        panel.add(createButton("Reset", e -> {
+            timeLabel.setText("0");
+            time = 0;
+        }));
+        panel.add(createButton("Send", nodeAction((n1, n2) -> {
+            time += network.getPath(n1, n2, true).getWeight();
+            timeLabel.setText(String.valueOf(time));
+        })));
+        add(panel);
     }
 
     private void addChangePanel() {
@@ -99,6 +119,10 @@ public class ToolbarPanel extends JPanel {
                 to.setSelected(changed);
             }
         })));
+        panel.add(createButton("Close all", e -> {
+            network.closeAll();
+            this.panel.update();
+        }));
         add(panel);
     }
 
