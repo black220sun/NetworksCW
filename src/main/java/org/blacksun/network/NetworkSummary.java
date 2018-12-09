@@ -5,19 +5,16 @@ import org.blacksun.graph.node.GraphNode;
 import org.blacksun.utils.Pair;
 import org.blacksun.utils.RandomGenerator;
 import org.blacksun.view.Config;
-import org.blacksun.view.NetworkPanel;
 import org.jetbrains.annotations.NotNull;
 
-import javax.swing.*;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.logging.Logger;
 
 public class NetworkSummary {
     private final Network network;
     private final Logger logger;
-    private final HashMap<Pair<GraphNode, GraphNode>, Integer> waiting;
-    private boolean updated = false;
+    private final ArrayList<Pair<Pair<GraphNode, GraphNode>, Integer>> waiting;
+    private boolean updated = true;
     private ArrayList<Pair<GraphPath, Integer>> toSend;
     private int time;
     private int packagesSent = 0;
@@ -29,12 +26,12 @@ public class NetworkSummary {
     public NetworkSummary(@NotNull Network network) {
         this.network = network;
         logger = Logger.getGlobal();
-        waiting = new HashMap<>();
+        waiting = new ArrayList<>();
         toSend = new ArrayList<>();
         cfg = Config.getConfig();
     }
 
-    private void prepareMessage() {
+    private void prepareMessage(boolean datagram) {
         int messageSize = cfg.getInt("message");
         RandomGenerator random = new RandomGenerator((int) (messageSize * 1.5),
                 (int) (messageSize * 0.5));
@@ -45,29 +42,27 @@ public class NetworkSummary {
         } while (fromNode.equals(toNode));
         int sending = random.next();
         logger.info("Sending " + sending + " bytes from " + fromNode + " to " + toNode);
-        GraphPath path = network.getPath(fromNode, toNode, true);
-        if (!path.exists()) {
-            logger.info("No active connection, creating new");
-            path = network.createConnection(fromNode, toNode);
-            if (!path.exists()) {
-                logger.warning("Can't create new connection. Waiting...");
-                waiting.put(new Pair<>(fromNode, toNode), messageSize);
-                return;
+        if (datagram) {
+            int packageSize = cfg.getInt("package");
+            while (sending > packageSize) {
+                waiting.add(new Pair<>(new Pair<>(fromNode, toNode), packageSize));
+                sending -= packageSize;
             }
-        } else {
-            logger.info("Active connection exists:\n\t" + path);
         }
-        toSend.add(computePair(path, messageSize));
+        waiting.add(new Pair<>(new Pair<>(fromNode, toNode), sending));
+        messagesSent++;
     }
 
     private void tryPrepare() {
         if (updated) {
-            ArrayList<Pair<GraphNode, GraphNode>> toRemove = new ArrayList<>();
-            waiting.forEach((pair, size) -> {
+            ArrayList<Pair<Pair<GraphNode, GraphNode>, Integer>> toRemove = new ArrayList<>();
+            waiting.forEach(entry -> {
+                Pair<GraphNode, GraphNode> pair = entry.getFirst();
+                int size = entry.getSecond();
                 GraphPath path = network.createConnection(pair.getFirst(), pair.getSecond());
                 if (path.exists()) {
                     logger.info("Created connection:\n\t" + path);
-                    toRemove.add(pair);
+                    toRemove.add(entry);
                     toSend.add(computePair(path, size));
                 }
             });
@@ -79,14 +74,15 @@ public class NetworkSummary {
     private Pair<GraphPath, Integer> computePair(GraphPath path, int messageSize) {
         int size = cfg.getInt("package");
         int amount = (messageSize + size - 1) / size;
-        int packages = amount * path.getWeight();
-        packagesSent += packages;
+        int ticks = amount * path.getWeight();
+        logger.info("Created " + amount + " package(s). Time to deliver: " + ticks + " ticks");
+        packagesSent += amount;
         bytesSent += messageSize;
         createdConnections += path.getLength();
-        return new Pair<>(path, packages);
+        return new Pair<>(path, ticks);
     }
 
-    private void send() {
+    private void send(boolean datagram) {
         ArrayList<Pair<GraphPath, Integer>> newToSend = new ArrayList<>();
         toSend.forEach(pair -> {
             int newLeft = pair.getSecond() - 1;
@@ -94,9 +90,9 @@ public class NetworkSummary {
                 newToSend.add(new Pair<>(pair.getFirst(), newLeft));
             } else {
                 GraphPath path = pair.getFirst();
-                logger.info("Message sent from " + path.getFrom() + " to " +
+                String what = datagram ? "Package" : "Message";
+                logger.info(what + " sent from " + path.getFrom() + " to " +
                         path.getTo() + ". Closing connection");
-                messagesSent++;
                 updated = true;
                 network.closeConnection(path);
             }
@@ -104,43 +100,44 @@ public class NetworkSummary {
         toSend = newToSend;
     }
 
-    private void summary() {
-        logger.info("SUMMARY");
+    private String summary() {
         double ticks = time;
-        logger.info("Time spent: " + time + "\n" +
-                "Messages sent: " + messagesSent + "\t(" + messagesSent / ticks + " per tick)\n" +
-                "Packages sent: " + packagesSent + "\t(" + packagesSent / ticks + " per tick)\n" +
-                "Bytes sent: " + bytesSent + "\t(" + bytesSent / ticks + " per tick)\n" +
-                "Connections created: " + createdConnections + "\t(" + createdConnections / ticks + " per tick)");
+        double msg = messagesSent;
+        String results = "SUMMARY\n" +
+                "Time spent: " + time + " ticks\n" +
+                "Messages sent: " + messagesSent + "\n" +
+                "Messages sent per tick: " + messagesSent / ticks + "\n" +
+                "Packages sent: " + packagesSent + "\n" +
+                "Packages sent per tick: " + packagesSent / ticks + "\n" +
+                "Packages sent per message: " + packagesSent / msg + "\n" +
+                "Bytes sent: " + bytesSent + "\n" +
+                "Bytes sent per tick: " + bytesSent / ticks + "\n" +
+                "Bytes sent per message: " + bytesSent / msg + "\n" +
+                "Connections created: " + createdConnections + "\n" +
+                "Connections created per tick: " + createdConnections / ticks + "\n" +
+                "Connections created per message: " + createdConnections / msg;
+        logger.info(results);
+        return results;
     }
 
-    private void iteration(NetworkPanel view, JLabel timeLabel) {
+    private void iteration(boolean datagram) {
         tryPrepare();
-        send();
+        send(datagram);
         time++;
-        if (cfg.getBoolean("render")) {
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
-               e.printStackTrace();
-            }
-            timeLabel.setText(String.valueOf(time));
-            view.update();
-        }
     }
 
-    public void runTests(@NotNull NetworkPanel view, JLabel timeLabel) {
+    public String runTests(boolean datagram) {
         int ticks = cfg.getInt("ticks");
         for (int i = 0; i < ticks; ++i) {
             if (i % 50 == 0) {
                 for (int j = 0; j < 10; ++j)
-                    prepareMessage();
+                    prepareMessage(datagram);
             }
-            iteration(view, timeLabel);
+            iteration(datagram);
         }
         while (!toSend.isEmpty() || !waiting.isEmpty()) {
-            iteration(view, timeLabel);
+            iteration(datagram);
         }
-        summary();
+        return summary();
     }
 }

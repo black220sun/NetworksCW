@@ -42,5 +42,6 @@ public class Main {
         FileHandler handler = new FileHandler("summary.log");
         handler.setFormatter(new SimpleFormatter());
         Logger.getGlobal().addHandler(handler);
+        Logger.getGlobal().setUseParentHandlers(false);
     }
 }

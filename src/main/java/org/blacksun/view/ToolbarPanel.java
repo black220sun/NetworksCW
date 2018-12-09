@@ -22,6 +22,8 @@ public class ToolbarPanel extends JPanel {
     private final JComboBox<GraphNode> toNode;
     private final JTextField text;
     private final JLabel timeLabel;
+    private final JTextArea virtualMode;
+    private final JTextArea datagramMode;
     private int time;
 
     public ToolbarPanel(NetworkPanel panel) {
@@ -41,6 +43,12 @@ public class ToolbarPanel extends JPanel {
         addGraphPanel();
         timeLabel = new JLabel("0");
         addTimePanel();
+        virtualMode = new JTextArea();
+        virtualMode.setEditable(false);
+        add(virtualMode);
+        datagramMode = new JTextArea();
+        datagramMode.setEditable(false);
+        add(datagramMode);
     }
 
     private void addTimePanel() {
@@ -57,7 +65,12 @@ public class ToolbarPanel extends JPanel {
             timeLabel.setText(String.valueOf(time));
         })));
         panel.add(createButton("Run test", e -> {
-            new Thread(() -> new NetworkSummary(network).runTests(networkPanel, timeLabel)).run();
+            virtualMode.setText("");
+            datagramMode.setText("");
+            virtualMode.setText("\tVIRTUAL CHANNEL MODE " +
+                    new NetworkSummary(network).runTests(false));
+            datagramMode.setText("\n\tDATAGRAM MODE " +
+                    new NetworkSummary(network).runTests(true));
         }));
         add(panel);
     }
@@ -145,7 +158,10 @@ public class ToolbarPanel extends JPanel {
     private Component createResize() {
         Config cfg = Config.getConfig();
         JCheckBox check = new JCheckBox("Resize graph?", cfg.getBoolean("resize"));
-        check.addChangeListener(e -> cfg.setProperty("resize", check.isSelected()));
+        check.addChangeListener(e -> {
+            cfg.setProperty("resize", check.isSelected());
+            networkPanel.update();
+        });
         return check;
     }
 
