@@ -1,92 +1,146 @@
 package org.blacksun.network;
 
-import guru.nidi.graphviz.model.MutableGraph;
 import org.blacksun.graph.algorithms.GraphPath;
 import org.blacksun.graph.node.GraphNode;
+import org.blacksun.utils.Pair;
+import org.blacksun.utils.RandomGenerator;
+import org.blacksun.view.Config;
+import org.blacksun.view.NetworkPanel;
 import org.jetbrains.annotations.NotNull;
 
+import javax.swing.*;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.HashMap;
 import java.util.logging.Logger;
 
 public class NetworkSummary {
     private final Network network;
     private final Logger logger;
+    private final HashMap<Pair<GraphNode, GraphNode>, Integer> waiting;
+    private boolean updated = false;
+    private ArrayList<Pair<GraphPath, Integer>> toSend;
+    private int time;
+    private int packagesSent = 0;
+    private int messagesSent = 0;
+    private int bytesSent = 0;
+    private int createdConnections = 0;
+    private final Config cfg;
 
     public NetworkSummary(@NotNull Network network) {
         this.network = network;
         logger = Logger.getGlobal();
+        waiting = new HashMap<>();
+        toSend = new ArrayList<>();
+        cfg = Config.getConfig();
     }
 
-    public void dumpNetwork() {
-        logger.info(network.stringRepresentation());
-    }
-
-    public MutableGraph dumpGraph() {
-        return network.toGraph();
-    }
-
-    public GraphPath createConnection(boolean close) {
-        GraphNode from = network.getRandomNode();
-        GraphNode to;
+    private void prepareMessage() {
+        int messageSize = cfg.getInt("message");
+        RandomGenerator random = new RandomGenerator((int) (messageSize * 1.5),
+                (int) (messageSize * 0.5));
+        GraphNode fromNode = network.getRandomNode();
+        GraphNode toNode;
         do {
-            to = network.getRandomNode();
-        } while (to.equals(from));
-        String base = "Creating connection from " + from + " to " + to + "\n";
-        GraphPath path = network.createConnection(from, to);
-        if (path.exists()) {
-            logger.info(base + "Success: " + path.toString());
-        } else {
-            logger.warning(base + "Failed");
-        }
-        if (close) {
-            closeConnection(path);
-        }
-        return path;
-    }
-
-    public void closeConnection(@NotNull GraphPath path) {
-        network.closeConnection(path);
-        logger.info("Closing connection: " + path);
-    }
-
-    public void collectSummary(int cycles) {
-        dumpNetwork();
-        int nodes = network.getNodes().size();
-        int maxConnections = Integer.max(nodes / 3, 12);
-        ArrayList<GraphPath> connections = new ArrayList<>();
-        for (int i = 0; i < cycles; ++i) {
-            logger.info("Cycle" + i);
-            connections.addAll(createConnections(maxConnections));
-            int forClose = connections.size() / 2;
-            closeConnections(connections, forClose);
-        }
-        logger.info("Closing all connections");
-        for (GraphPath connection: connections) {
-            closeConnection(connection);
-        }
-    }
-
-    public List<GraphPath> createConnections(int amount) {
-        logger.info("Trying to create " + amount + " connections");
-        ArrayList<GraphPath> connections = new ArrayList<>();
-        for (int i = 0; i < amount; ++i) {
-            GraphPath result = createConnection(false);
-            if (result.exists()) {
-                connections.add(result);
+            toNode = network.getRandomNode();
+        } while (fromNode.equals(toNode));
+        int sending = random.next();
+        logger.info("Sending " + sending + " bytes from " + fromNode + " to " + toNode);
+        GraphPath path = network.getPath(fromNode, toNode, true);
+        if (!path.exists()) {
+            logger.info("No active connection, creating new");
+            path = network.createConnection(fromNode, toNode);
+            if (!path.exists()) {
+                logger.warning("Can't create new connection. Waiting...");
+                waiting.put(new Pair<>(fromNode, toNode), messageSize);
+                return;
             }
+        } else {
+            logger.info("Active connection exists:\n\t" + path);
         }
-        return connections;
+        toSend.add(computePair(path, messageSize));
     }
 
-    public void closeConnections(List<GraphPath> connections, int amount) {
-        logger.info("Closing " + amount + " connections");
-        Random random = new Random();
-        for (int i = 0; i < amount; ++i) {
-            GraphPath path = connections.get(random.nextInt(connections.size()));
-            closeConnection(path);
-            connections.remove(path);
+    private void tryPrepare() {
+        if (updated) {
+            ArrayList<Pair<GraphNode, GraphNode>> toRemove = new ArrayList<>();
+            waiting.forEach((pair, size) -> {
+                GraphPath path = network.createConnection(pair.getFirst(), pair.getSecond());
+                if (path.exists()) {
+                    logger.info("Created connection:\n\t" + path);
+                    toRemove.add(pair);
+                    toSend.add(computePair(path, size));
+                }
+            });
+            toRemove.forEach(waiting::remove);
+            updated = false;
         }
+    }
+
+    private Pair<GraphPath, Integer> computePair(GraphPath path, int messageSize) {
+        int size = cfg.getInt("package");
+        int amount = (messageSize + size - 1) / size;
+        int packages = amount * path.getWeight();
+        packagesSent += packages;
+        bytesSent += messageSize;
+        createdConnections += path.getLength();
+        return new Pair<>(path, packages);
+    }
+
+    private void send() {
+        ArrayList<Pair<GraphPath, Integer>> newToSend = new ArrayList<>();
+        toSend.forEach(pair -> {
+            int newLeft = pair.getSecond() - 1;
+            if (newLeft > 0) {
+                newToSend.add(new Pair<>(pair.getFirst(), newLeft));
+            } else {
+                GraphPath path = pair.getFirst();
+                logger.info("Message sent from " + path.getFrom() + " to " +
+                        path.getTo() + ". Closing connection");
+                messagesSent++;
+                updated = true;
+                network.closeConnection(path);
+            }
+        });
+        toSend = newToSend;
+    }
+
+    private void summary() {
+        logger.info("SUMMARY");
+        double ticks = time;
+        logger.info("Time spent: " + time + "\n" +
+                "Messages sent: " + messagesSent + "\t(" + messagesSent / ticks + " per tick)\n" +
+                "Packages sent: " + packagesSent + "\t(" + packagesSent / ticks + " per tick)\n" +
+                "Bytes sent: " + bytesSent + "\t(" + bytesSent / ticks + " per tick)\n" +
+                "Connections created: " + createdConnections + "\t(" + createdConnections / ticks + " per tick)");
+    }
+
+    private void iteration(NetworkPanel view, JLabel timeLabel) {
+        tryPrepare();
+        send();
+        time++;
+        if (cfg.getBoolean("render")) {
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException e) {
+               e.printStackTrace();
+            }
+            timeLabel.setText(String.valueOf(time));
+            view.update();
+        }
+    }
+
+    public void runTests(@NotNull NetworkPanel view, JLabel timeLabel) {
+        int ticks = cfg.getInt("ticks");
+        for (int i = 0; i < ticks; ++i) {
+            if (i % 50 == 0) {
+                for (int j = 0; j < 10; ++j)
+                    prepareMessage();
+            }
+            iteration(view, timeLabel);
+        }
+        while (!toSend.isEmpty() || !waiting.isEmpty()) {
+            iteration(view, timeLabel);
+        }
+        summary();
     }
 }

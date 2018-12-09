@@ -173,9 +173,9 @@ public class Network implements StringRepresentable {
         MutableGraph g = mutGraph("network")
                 .setDirected(true);
         nodes.forEach(node -> {
-            Color color = cfg.getNodeColor();
+            Color color = cfg.getColor("node");
             if (node.isSelected())
-                color = cfg.getSelectedNodeColor();
+                color = cfg.getColor("selectedN");
             map.put(node, mutNode(node.toString()).add(color));
         });
         nodes.forEach(node -> {
@@ -183,11 +183,11 @@ public class Network implements StringRepresentable {
             g.add(mNode);
             node.getConnections().forEach(ch -> {
                 MutableNode toNode = map.get(ch.getToNode());
-                Color color = cfg.getChannelColor();
+                Color color = cfg.getColor("channel");
                 if (ch.isUsed())
-                    color = cfg.getConnectedChannelColor();
+                    color = cfg.getColor("connected");
                 if (ch.isSelected())
-                    color = cfg.getSelectedChannelColor();
+                    color = cfg.getColor("selectedC");
                 mNode.addLink(to(toNode).
                         with(Label.markdown(String.valueOf(ch.getWeight())),
                                 color));

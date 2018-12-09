@@ -16,7 +16,8 @@ public class NetworkPanel extends JScrollPane {
         render = new NetworkRender(network);
         viewport.setView(render);
         Config cfg = Config.getConfig();
-        setPreferredSize(new Dimension(cfg.getViewWidth(), cfg.getViewHeight()));
+        setPreferredSize(new Dimension(cfg.getInt("viewW"),
+                cfg.getInt("viewH")));
     }
 
     public void update() {

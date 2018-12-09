@@ -7,6 +7,8 @@ import org.blacksun.graph.channel.SimplexChannel;
 import org.blacksun.graph.node.GraphNode;
 import org.blacksun.graph.node.NamedGraphNode;
 import org.blacksun.network.Network;
+import org.blacksun.network.NetworkSummary;
+import org.blacksun.utils.WeightList;
 
 import javax.swing.*;
 import java.awt.*;
@@ -14,7 +16,7 @@ import java.awt.event.ActionListener;
 import java.util.function.BiConsumer;
 
 public class ToolbarPanel extends JPanel {
-    private final NetworkPanel panel;
+    private final NetworkPanel networkPanel;
     private final Network network;
     private final JComboBox<GraphNode> fromNode;
     private final JComboBox<GraphNode> toNode;
@@ -24,7 +26,7 @@ public class ToolbarPanel extends JPanel {
 
     public ToolbarPanel(NetworkPanel panel) {
         super();
-        this.panel = panel;
+        this.networkPanel = panel;
         network = panel.getNetwork();
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         GraphNode[] nodes = network.getNodes().toArray(new GraphNode[]{});
@@ -54,6 +56,9 @@ public class ToolbarPanel extends JPanel {
             time += network.getPath(n1, n2, true).getWeight();
             timeLabel.setText(String.valueOf(time));
         })));
+        panel.add(createButton("Run test", e -> {
+            new Thread(() -> new NetworkSummary(network).runTests(networkPanel, timeLabel)).run();
+        }));
         add(panel);
     }
 
@@ -64,7 +69,7 @@ public class ToolbarPanel extends JPanel {
             GraphNode node = network.addNode();
             fromNode.addItem(node);
             toNode.addItem(node);
-            panel.update();
+            networkPanel.update();
         }));
         pane.add(createButton("Remove", nodeAction((node, n) -> {
             network.removeNode(node);
@@ -79,7 +84,8 @@ public class ToolbarPanel extends JPanel {
         })));
         pane.add(createButton("Link", nodeAction((n1, n2) -> {
             String name = text.getText().toLowerCase();
-            int weight = Config.getConfig().getWeightList().getWeight();
+            int weight = Config.getConfig().
+                    <WeightList>getProperty("weights").getWeight();
             if (name.startsWith("duplex")) {
                 new DuplexChannel(n1, n2, weight, Channel.ERRORS_AMOUNT);
             } else if (name.startsWith("half")) {
@@ -121,7 +127,7 @@ public class ToolbarPanel extends JPanel {
         })));
         panel.add(createButton("Close all", e -> {
             network.closeAll();
-            this.panel.update();
+            this.networkPanel.update();
         }));
         add(panel);
     }
@@ -138,8 +144,8 @@ public class ToolbarPanel extends JPanel {
 
     private Component createResize() {
         Config cfg = Config.getConfig();
-        JCheckBox check = new JCheckBox("Resize graph?", cfg.isResizeGraph());
-        check.addChangeListener(e -> cfg.setResizeGraph(check.isSelected()));
+        JCheckBox check = new JCheckBox("Resize graph?", cfg.getBoolean("resize"));
+        check.addChangeListener(e -> cfg.setProperty("resize", check.isSelected()));
         return check;
     }
 
@@ -154,7 +160,7 @@ public class ToolbarPanel extends JPanel {
             GraphNode from = (GraphNode) fromNode.getSelectedItem();
             GraphNode to = (GraphNode) toNode.getSelectedItem();
             consumer.accept(from, to);
-            panel.update();
+            networkPanel.update();
         };
     }
 
@@ -163,7 +169,7 @@ public class ToolbarPanel extends JPanel {
             Config cfg = Config.getConfig();
             int value = Integer.parseInt(text.getText());
             consumer.accept(cfg, value);
-            panel.update();
+            networkPanel.update();
         };
     }
 }

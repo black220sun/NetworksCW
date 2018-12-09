@@ -1,132 +1,90 @@
 package org.blacksun.view;
 
 import guru.nidi.graphviz.attribute.Color;
-import org.blacksun.utils.WeightList;
+
+import java.util.HashMap;
 
 public class Config {
+    private final class Link {
+        private final String name;
+
+        Link(String name) {
+            this.name = name;
+        }
+    }
+
     private static Config cfg = new Config();
-    private int frameWidth = 2000;
-    private int frameHeight = 1050;
-    private int viewWidth = 1400;
-    private int viewHeight = frameHeight;
-    private boolean resizeGraph = true;
-    private int graphWidth = viewWidth - 20;
-    private int graphHeight = viewHeight - 70;
-    private Color nodeColor = Color.BLACK;
-    private Color selectedNodeColor = Color.BLUE;
-    private Color channelColor = Color.BLACK;
-    private Color selectedChannelColor = Color.BLUE;
-    private Color connectedChannelColor = Color.RED;
-    private WeightList weightList;
+
+    private final HashMap<String, Object> properties;
 
     private Config() {
-    }
-
-    public int getFrameWidth() {
-        return frameWidth;
-    }
-
-    public void setFrameWidth(int frameWidth) {
-        this.frameWidth = frameWidth;
-    }
-
-    public int getFrameHeight() {
-        return frameHeight;
-    }
-
-    public void setFrameHeight(int frameHeight) {
-        this.frameHeight = frameHeight;
-    }
-
-    public int getViewWidth() {
-        return viewWidth;
-    }
-
-    public void setViewWidth(int viewWidth) {
-        this.viewWidth = viewWidth;
-    }
-
-    public int getViewHeight() {
-        return viewHeight;
-    }
-
-    public void setViewHeight(int viewHeight) {
-        this.viewHeight = viewHeight;
-    }
-
-    public boolean isResizeGraph() {
-        return resizeGraph;
-    }
-
-    public void setResizeGraph(boolean resizeGraph) {
-        this.resizeGraph = resizeGraph;
-    }
-
-    public int getGraphWidth() {
-        return graphWidth;
-    }
-
-    public void setGraphWidth(int graphWidth) {
-        this.graphWidth = graphWidth;
-    }
-
-    public int getGraphHeight() {
-        return graphHeight;
-    }
-
-    public void setGraphHeight(int graphHeight) {
-        this.graphHeight = graphHeight;
-    }
-
-    public Color getNodeColor() {
-        return nodeColor;
-    }
-
-    public void setNodeColor(Color nodeColor) {
-        this.nodeColor = nodeColor;
-    }
-
-    public Color getSelectedNodeColor() {
-        return selectedNodeColor;
-    }
-
-    public void setSelectedNodeColor(Color selectedNodeColor) {
-        this.selectedNodeColor = selectedNodeColor;
-    }
-
-    public Color getChannelColor() {
-        return channelColor;
-    }
-
-    public void setChannelColor(Color channelColor) {
-        this.channelColor = channelColor;
-    }
-
-    public Color getSelectedChannelColor() {
-        return selectedChannelColor;
-    }
-
-    public void setSelectedChannelColor(Color selectedChannelColor) {
-        this.selectedChannelColor = selectedChannelColor;
-    }
-
-    public Color getConnectedChannelColor() {
-        return connectedChannelColor;
-    }
-
-    public void setConnectedChannelColor(Color connectedChannelColor) {
-        this.connectedChannelColor = connectedChannelColor;
+        properties = new HashMap<> ();
+        properties.put("frameW", 2000);
+        properties.put("frameH", 1050);
+        properties.put("viewW", 1400);
+        properties.put("viewH", new Link("frameH"));
+        properties.put("graphW", 1380);
+        properties.put("graphH", 980);
+        properties.put("resize", true);
+        properties.put("selectedN", Color.BLUE);
+        properties.put("selectedC", Color.BLUE);
+        properties.put("connected", Color.RED);
+        properties.put("package", 256);
+        properties.put("message", 1024);
+        //properties.put("render", true);
+        properties.put("ticks", 2000);
     }
 
     public static Config getConfig() {
         return cfg;
     }
 
-    public WeightList getWeightList() {
-        return weightList;
+    public Color getColor(String property) {
+        return getProperty(property, Color.BLACK);
     }
 
-    public void setWeightList(WeightList weightList) {
-        this.weightList = weightList;
+    public int getInt(String property) {
+        return getProperty(property, 0);
+    }
+
+    public boolean getBoolean(String property) {
+        return getProperty(property, false);
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T> T getProperty(String property) {
+        Object value = properties.get(property);
+        if (value instanceof Link)
+            return (T) this.getProperty(((Link) value).name);
+        return (T) value;
+    }
+
+    public <T> T getProperty(String property, T defaultValue) {
+        T value = getProperty(property);
+        return value == null ? defaultValue : value;
+    }
+
+    public void setProperty(String property, Object value) {
+        properties.put(property, value);
+    }
+
+    // to simplify toolbar
+    public void setFrameWidth(Integer integer) {
+        setProperty("frameW", integer);
+    }
+    public void setFrameHeight(Integer integer) {
+        setProperty("frameH", integer);
+    }
+    public void setViewWidth(Integer integer) {
+        setProperty("viewW", integer);
+    }
+    public void setViewHeight(Integer integer) {
+        setProperty("viewH", integer);
+    }
+    public void setGraphWidth(Integer integer) {
+        setProperty("graphW", integer);
+    }
+    public void setGraphHeight(Integer integer) {
+        setProperty("graphH", integer);
     }
 }

@@ -15,7 +15,8 @@ public class MainFrame extends JFrame {
         super(title);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         Config cfg = Config.getConfig();
-        setPreferredSize(new Dimension(cfg.getFrameWidth(), cfg.getFrameHeight()));
+        setPreferredSize(new Dimension(cfg.getInt("frameW"),
+                cfg.getInt("frameH")));
         JSplitPane pane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
         NetworkPanel networkPanel = new NetworkPanel(network);
         pane.setLeftComponent(networkPanel);

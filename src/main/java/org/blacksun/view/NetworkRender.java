@@ -22,9 +22,9 @@ class NetworkRender extends JPanel {
                 .render(Format.SVG)
                 .toImage();
         Config cfg = Config.getConfig();
-        if (cfg.isResizeGraph()) {
-            networkImage = networkImage.getScaledInstance(cfg.getGraphWidth(),
-                    cfg.getGraphHeight(), Image.SCALE_SMOOTH);
+        if (cfg.getBoolean("resize")) {
+            networkImage = networkImage.getScaledInstance(cfg.getInt("graphW"),
+                    cfg.getInt("graphH"), Image.SCALE_SMOOTH);
         }
         setPreferredSize(new Dimension(networkImage.getWidth(this),
                 networkImage.getHeight(this)));

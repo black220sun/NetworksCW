@@ -87,12 +87,20 @@ public final class GraphPath implements Iterable<Channel> {
                 .collect(Collectors.joining(" --> "));
     }
 
+    public GraphNode getFrom() {
+        return links.get(0).getFromNode();
+    }
+
+    public GraphNode getTo() {
+        return links.get(links.size() - 1).getToNode();
+    }
+
     public boolean ofNodes(GraphNode from, GraphNode to) {
         if (from == to && cycle)
             return true;
         if (links.isEmpty())
             return false;
-        return links.get(0).getFromNode().equals(from) &&
-                links.get(links.size() - 1).getToNode().equals(to);
+        return getFrom().equals(from) &&
+                getTo().equals(to);
     }
 }
