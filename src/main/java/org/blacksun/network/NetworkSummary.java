@@ -112,8 +112,10 @@ public class NetworkSummary {
                 "Time spent: " + time + " ticks\n" +
                 "Messages sent: " + messagesSent + "\n" +
                 "Messages sent per tick: " + messagesSent / ticks + "\n" +
+                "Ticks per message: " + time / msg + "\n" +
                 "Packages sent: " + packagesSent + "\n" +
                 "Packages sent per tick: " + packagesSent / ticks + "\n" +
+                "Ticks per package: " + ticks / packagesSent + "\n" +
                 "Packages sent per message: " + packagesSent / msg + "\n" +
                 "Bytes sent: " + bytesSent + "\n" +
                 "Bytes sent per tick: " + bytesSent / ticks + "\n" +
