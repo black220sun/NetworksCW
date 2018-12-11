@@ -3,16 +3,9 @@ package org.blacksun.view;
 import guru.nidi.graphviz.attribute.Color;
 
 import java.util.HashMap;
+import java.util.function.Supplier;
 
 public class Config {
-    private final class Link {
-        private final String name;
-
-        Link(String name) {
-            this.name = name;
-        }
-    }
-
     private static Config cfg = new Config();
 
     private final HashMap<String, Object> properties;
@@ -22,17 +15,19 @@ public class Config {
         properties.put("frameW", 2000);
         properties.put("frameH", 1050);
         properties.put("viewW", 1400);
-        properties.put("viewH", new Link("frameH"));
-        properties.put("graphW", 1380);
-        properties.put("graphH", 980);
+        properties.put("viewH", (Supplier) () -> getInt("frameH"));
+        properties.put("graphW", (Supplier) () -> getInt("viewW") - 20);
+        properties.put("graphH", (Supplier) () -> getInt("viewH") - 70);
         properties.put("resize", true);
         properties.put("selectedN", Color.BLUE);
         properties.put("selectedC", Color.BLUE);
         properties.put("connected", Color.RED);
-        properties.put("package", 256);
-        properties.put("message", 1024);
+        properties.put("package", 256); // package size
+        properties.put("message", 1024); // average message size (+/- 50%)
         //properties.put("render", true);
-        properties.put("ticks", 2000);
+        properties.put("ticks", 2000); // min ticks for a single test
+        properties.put("delay", 50); // delay between messages appearance
+        properties.put("amount", 10); // amount of appeared messages
     }
 
     public static Config getConfig() {
@@ -54,8 +49,8 @@ public class Config {
     @SuppressWarnings("unchecked")
     public <T> T getProperty(String property) {
         Object value = properties.get(property);
-        if (value instanceof Link)
-            return (T) this.getProperty(((Link) value).name);
+        if (value instanceof Supplier)
+            return (T) ((Supplier) value).get();
         return (T) value;
     }
 

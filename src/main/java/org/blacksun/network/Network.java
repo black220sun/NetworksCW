@@ -6,6 +6,7 @@ import guru.nidi.graphviz.model.MutableGraph;
 import guru.nidi.graphviz.model.MutableNode;
 import org.blacksun.graph.algorithms.BFAlgorithmFactory;
 import org.blacksun.graph.algorithms.GraphPath;
+import org.blacksun.graph.algorithms.PathFindingAlgorithm;
 import org.blacksun.graph.algorithms.PathFindingAlgorithmFactory;
 import org.blacksun.graph.channel.Channel;
 import org.blacksun.graph.node.GraphNode;
@@ -73,6 +74,21 @@ public class Network implements StringRepresentable {
         if (!exists(from, to))
             return new GraphPath();
         return factory.getAlgorithm(nodes, getChannels(isUsed)).getPath(from, to);
+    }
+
+    public List<GraphPath> getPaths(@NotNull GraphNode from) {
+        PathFindingAlgorithm algorithm = factory.getAlgorithm(nodes, getChannels());
+        return nodes.stream()
+                .filter(node -> !node.equals(from))
+                .map(node -> algorithm.getPath(from, node))
+                .collect(Collectors.toList());
+    }
+
+    private List<Channel> getChannels() {
+        return nodes.stream()
+                .flatMap(node -> node.getConnections().stream())
+                .distinct()
+                .collect(Collectors.toList());
     }
 
     private List<Channel> getChannels(boolean isUsed) {

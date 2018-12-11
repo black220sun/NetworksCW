@@ -103,4 +103,17 @@ public final class GraphPath implements Iterable<Channel> {
         return getFrom().equals(from) &&
                 getTo().equals(to);
     }
+
+    // sending package in datagram mode
+    public void close(int weight) {
+        int sum = 0;
+        for (int i = links.size() - 1; i >= 0; --i) {
+            Channel channel = links.get(i);
+            if (weight > sum) {
+                sum += channel.getWeight();
+            } else {
+                channel.setUsed(false);
+            }
+        }
+    }
 }

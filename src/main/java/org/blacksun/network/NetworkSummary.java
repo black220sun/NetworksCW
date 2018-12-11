@@ -86,15 +86,20 @@ public class NetworkSummary {
         ArrayList<Pair<GraphPath, Integer>> newToSend = new ArrayList<>();
         toSend.forEach(pair -> {
             int newLeft = pair.getSecond() - 1;
+            GraphPath path = pair.getFirst();
+            if (datagram) {
+                path.close(newLeft);
+            }
             if (newLeft > 0) {
-                newToSend.add(new Pair<>(pair.getFirst(), newLeft));
+                newToSend.add(new Pair<>(path, newLeft));
             } else {
-                GraphPath path = pair.getFirst();
                 String what = datagram ? "Package" : "Message";
                 logger.info(what + " sent from " + path.getFrom() + " to " +
                         path.getTo() + ". Closing connection");
                 updated = true;
-                network.closeConnection(path);
+                if (!datagram) {
+                    network.closeConnection(path);
+                }
             }
         });
         toSend = newToSend;
@@ -128,9 +133,11 @@ public class NetworkSummary {
 
     public String runTests(boolean datagram) {
         int ticks = cfg.getInt("ticks");
+        int delay = cfg.getInt("delay");
+        int amount = cfg.getInt("amount");
         for (int i = 0; i < ticks; ++i) {
-            if (i % 50 == 0) {
-                for (int j = 0; j < 10; ++j)
+            if (i % delay == 0) {
+                for (int j = 0; j < amount; ++j)
                     prepareMessage(datagram);
             }
             iteration(datagram);

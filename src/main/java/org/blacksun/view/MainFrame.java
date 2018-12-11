@@ -13,7 +13,7 @@ public class MainFrame extends JFrame {
 
     public MainFrame(String title, @NotNull Network network) {
         super(title);
-        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         Config cfg = Config.getConfig();
         setPreferredSize(new Dimension(cfg.getInt("frameW"),
                 cfg.getInt("frameH")));

@@ -1,5 +1,6 @@
 package org.blacksun.view;
 
+import org.blacksun.graph.algorithms.GraphPath;
 import org.blacksun.graph.channel.Channel;
 import org.blacksun.graph.channel.DuplexChannel;
 import org.blacksun.graph.channel.HalfDuplexChannel;
@@ -14,6 +15,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.util.function.BiConsumer;
+import java.util.stream.Collectors;
 
 public class ToolbarPanel extends JPanel {
     private final NetworkPanel networkPanel;
@@ -22,8 +24,7 @@ public class ToolbarPanel extends JPanel {
     private final JComboBox<GraphNode> toNode;
     private final JTextField text;
     private final JLabel timeLabel;
-    private final JTextArea virtualMode;
-    private final JTextArea datagramMode;
+    private final JTextArea infoArea;
     private int time;
 
     public ToolbarPanel(NetworkPanel panel) {
@@ -39,16 +40,34 @@ public class ToolbarPanel extends JPanel {
         addNodePanel();
         add(text);
         addChangePanel();
-        addViewPanel();
-        addGraphPanel();
+        addSettingsPanel();
+        addInfoPanel();
         timeLabel = new JLabel("0");
         addTimePanel();
-        virtualMode = new JTextArea();
-        virtualMode.setEditable(false);
-        add(virtualMode);
-        datagramMode = new JTextArea();
-        datagramMode.setEditable(false);
-        add(datagramMode);
+        infoArea = new JTextArea();
+        infoArea.setEditable(false);
+        add(infoArea);
+    }
+
+    private void addSettingsPanel() {
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+        panel.add(createButton("Settings", e -> new SettingsFrame()));
+        panel.add(createButton("Update", e -> networkPanel.update()));
+        add(panel);
+    }
+
+    private void addInfoPanel() {
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+        panel.add(createButton("Show table", e -> {
+            GraphNode node = (GraphNode) fromNode.getSelectedItem();
+            infoArea.setText(network.getPaths(node).stream()
+                    .map(GraphPath::toString)
+                    .collect(Collectors.joining("\n")));
+        }));
+        panel.add(createButton("Clear", e -> infoArea.setText("")));
+        add(panel);
     }
 
     private void addTimePanel() {
@@ -65,11 +84,10 @@ public class ToolbarPanel extends JPanel {
             timeLabel.setText(String.valueOf(time));
         })));
         panel.add(createButton("Run test", e -> {
-            virtualMode.setText("");
-            datagramMode.setText("");
-            virtualMode.setText("\tVIRTUAL CHANNEL MODE " +
-                    new NetworkSummary(network).runTests(false));
-            datagramMode.setText("\n\tDATAGRAM MODE " +
+            infoArea.setText("");
+            infoArea.setText("\tVIRTUAL CHANNEL MODE " +
+                    new NetworkSummary(network).runTests(false) +
+                    "\n\tDATAGRAM MODE " +
                     new NetworkSummary(network).runTests(true));
         }));
         add(panel);
@@ -113,15 +131,6 @@ public class ToolbarPanel extends JPanel {
         add(pane);
     }
 
-    private void addGraphPanel() {
-        JPanel panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
-        panel.add(createResize());
-        panel.add(createButton("Graph width", cfgAction(Config::setGraphWidth)));
-        panel.add(createButton("Graph height", cfgAction(Config::setGraphHeight)));
-        add(panel);
-    }
-
     private void addNodePanel() {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
@@ -145,26 +154,6 @@ public class ToolbarPanel extends JPanel {
         add(panel);
     }
 
-    private void addViewPanel() {
-        JPanel panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
-        panel.add(createButton("Frame width", cfgAction(Config::setFrameWidth)));
-        panel.add(createButton("Frame height", cfgAction(Config::setFrameHeight)));
-        panel.add(createButton("View width", cfgAction(Config::setViewHeight)));
-        panel.add(createButton("View height", cfgAction(Config::setViewWidth)));
-        add(panel);
-    }
-
-    private Component createResize() {
-        Config cfg = Config.getConfig();
-        JCheckBox check = new JCheckBox("Resize graph?", cfg.getBoolean("resize"));
-        check.addChangeListener(e -> {
-            cfg.setProperty("resize", check.isSelected());
-            networkPanel.update();
-        });
-        return check;
-    }
-
     private Component createButton(String name, ActionListener action) {
         JButton button = new JButton(name);
         button.addActionListener(action);
@@ -176,15 +165,6 @@ public class ToolbarPanel extends JPanel {
             GraphNode from = (GraphNode) fromNode.getSelectedItem();
             GraphNode to = (GraphNode) toNode.getSelectedItem();
             consumer.accept(from, to);
-            networkPanel.update();
-        };
-    }
-
-    private ActionListener cfgAction(BiConsumer<Config, Integer> consumer) {
-        return e -> {
-            Config cfg = Config.getConfig();
-            int value = Integer.parseInt(text.getText());
-            consumer.accept(cfg, value);
             networkPanel.update();
         };
     }

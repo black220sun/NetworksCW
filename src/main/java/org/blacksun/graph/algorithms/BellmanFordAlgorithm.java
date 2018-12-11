@@ -14,13 +14,18 @@ public class BellmanFordAlgorithm implements PathFindingAlgorithm {
     private final List<Channel> links;
     private HashMap<Pair<GraphNode, Integer>, Integer> map;
     private HashMap<Pair<GraphNode, Integer>, GraphNode> pathMap;
+    private GraphNode last;
 
     public BellmanFordAlgorithm(@NotNull List<GraphNode> nodes, @NotNull List<Channel> links) {
         this.nodes = nodes;
         this.links = links;
+        last = null;
     }
 
     private void computePaths(@NotNull GraphNode from) {
+        if (from.equals(last)) // already computed, return cached
+            return;
+        last = from;
         map = new HashMap<>();
         pathMap = new HashMap<>();
         int size = nodes.size();
