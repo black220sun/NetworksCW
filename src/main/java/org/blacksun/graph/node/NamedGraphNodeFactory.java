@@ -1,7 +1,7 @@
 package org.blacksun.graph.node;
 
 import org.blacksun.graph.channel.ChannelFactory;
-import org.blacksun.graph.channel.DuplexChannelFactory;
+import org.blacksun.utils.Config;
 import org.jetbrains.annotations.NotNull;
 
 public class NamedGraphNodeFactory implements GraphNodeFactory {
@@ -14,7 +14,7 @@ public class NamedGraphNodeFactory implements GraphNodeFactory {
     }
 
     public NamedGraphNodeFactory(@NotNull String name) {
-        this(name, new DuplexChannelFactory());
+        this(name, Config.getConfig().getProperty("channelFactory"));
     }
 
     public NamedGraphNodeFactory(@NotNull String name, @NotNull ChannelFactory factory) {

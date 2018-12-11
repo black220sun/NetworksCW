@@ -14,7 +14,6 @@ public class SimpleTopology implements Topology {
     private final int order;
     private final int lower;
     private final WeightList weights;
-    @NotNull
     private final GraphNodeFactory factory;
 
     public SimpleTopology(int amount, double order,

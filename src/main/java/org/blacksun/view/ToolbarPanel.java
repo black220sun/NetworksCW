@@ -1,14 +1,12 @@
 package org.blacksun.view;
 
 import org.blacksun.graph.algorithms.GraphPath;
-import org.blacksun.graph.channel.Channel;
-import org.blacksun.graph.channel.DuplexChannel;
-import org.blacksun.graph.channel.HalfDuplexChannel;
-import org.blacksun.graph.channel.SimplexChannel;
+import org.blacksun.graph.channel.*;
 import org.blacksun.graph.node.GraphNode;
 import org.blacksun.graph.node.NamedGraphNode;
 import org.blacksun.network.Network;
 import org.blacksun.network.NetworkSummary;
+import org.blacksun.utils.Config;
 import org.blacksun.utils.WeightList;
 
 import javax.swing.*;
@@ -85,7 +83,8 @@ public class ToolbarPanel extends JPanel {
         })));
         panel.add(createButton("Run test", e -> {
             infoArea.setText("");
-            infoArea.setText("\tVIRTUAL CHANNEL MODE " +
+            infoArea.setText("\t" + NetworkSummary.getConfigOptions() +
+                    "\n\tVIRTUAL CHANNEL MODE " +
                     new NetworkSummary(network).runTests(false) +
                     "\n\tDATAGRAM MODE " +
                     new NetworkSummary(network).runTests(true));
@@ -114,20 +113,19 @@ public class ToolbarPanel extends JPanel {
             }
         })));
         pane.add(createButton("Link", nodeAction((n1, n2) -> {
-            String name = text.getText().toLowerCase();
-            int weight = Config.getConfig().
-                    <WeightList>getProperty("weights").getWeight();
-            if (name.startsWith("duplex")) {
-                new DuplexChannel(n1, n2, weight, Channel.ERRORS_AMOUNT);
-            } else if (name.startsWith("half")) {
-                new HalfDuplexChannel(n1, n2, weight, Channel.ERRORS_AMOUNT);
-            } else if (name.startsWith("simplex")) {
-                new SimplexChannel(n1, n2, weight, Channel.ERRORS_AMOUNT);
-            } else { // use default channel
-                n1.addConnectedNode(n2, weight);
-            }
+            Config cfg = Config.getConfig();
+            int weight = cfg.<WeightList>getProperty("weights").getWeight();
+            cfg.<ChannelFactory>getProperty("channelFactory").createChannel(n1, n2, weight);
         })));
         pane.add(createButton("Unlink", nodeAction(network::removeConnection)));
+        pane.add(createButton("Generate", e -> {
+            Config.getConfig().setProperty("counter", 0);
+            network.generateNetwork();
+            fromNode.removeAllItems();
+            toNode.removeAllItems();
+            network.getNodes().forEach(node -> { fromNode.addItem(node); toNode.addItem(node); });
+            networkPanel.update();
+        }));
         add(pane);
     }
 

@@ -1,6 +1,7 @@
 package org.blacksun.view;
 
 import org.blacksun.network.Network;
+import org.blacksun.utils.Config;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;

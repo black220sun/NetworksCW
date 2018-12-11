@@ -1,9 +1,12 @@
 package org.blacksun.graph.node;
 
 import org.blacksun.graph.channel.ChannelFactory;
+import org.blacksun.utils.Config;
 import org.jetbrains.annotations.NotNull;
 
 public class SimpleNodeFactory extends NamedGraphNodeFactory {
+    private final Config cfg = Config.getConfig();
+
     public SimpleNodeFactory() {
         super();
     }
@@ -18,6 +21,9 @@ public class SimpleNodeFactory extends NamedGraphNodeFactory {
 
     @Override
     public GraphNode createNode() {
-        return new SimpleNode(name + nodesCounter++, factory);
+        int counter = cfg.getInt("counter");
+        GraphNode node = new SimpleNode(name + counter, cfg.getProperty("channelFactory"));
+        cfg.setProperty("counter", ++counter);
+        return node;
     }
 }

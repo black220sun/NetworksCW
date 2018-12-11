@@ -3,6 +3,7 @@ package org.blacksun.view;
 import guru.nidi.graphviz.engine.Format;
 import guru.nidi.graphviz.engine.Graphviz;
 import org.blacksun.network.Network;
+import org.blacksun.utils.Config;
 
 import javax.swing.*;
 import java.awt.*;

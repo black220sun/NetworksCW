@@ -4,7 +4,7 @@ import org.blacksun.graph.algorithms.GraphPath;
 import org.blacksun.graph.node.GraphNode;
 import org.blacksun.utils.Pair;
 import org.blacksun.utils.RandomGenerator;
-import org.blacksun.view.Config;
+import org.blacksun.utils.Config;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -21,14 +21,23 @@ public class NetworkSummary {
     private int messagesSent = 0;
     private int bytesSent = 0;
     private int createdConnections = 0;
-    private final Config cfg;
+    private static final Config cfg = Config.getConfig();
 
     public NetworkSummary(@NotNull Network network) {
         this.network = network;
         logger = Logger.getGlobal();
         waiting = new ArrayList<>();
         toSend = new ArrayList<>();
-        cfg = Config.getConfig();
+    }
+
+    public static String getConfigOptions() {
+        return "ENVIRONMENT\n" +
+                "Default channel type: " + cfg.getProperty("channelFactory") + "\n" +
+                "Base time: " + cfg.getInt("ticks") + "\n" +
+                "Average message size: " + cfg.getInt("message") + "\n" +
+                "Package size: " + cfg.getInt("package") + "\n" +
+                "Message appearance delay: " + cfg.getInt("delay") + "\n" +
+                "Message appearance amount: " + cfg.getInt("amount");
     }
 
     private void prepareMessage(boolean datagram) {

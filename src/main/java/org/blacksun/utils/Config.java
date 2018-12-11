@@ -1,6 +1,7 @@
-package org.blacksun.view;
+package org.blacksun.utils;
 
 import guru.nidi.graphviz.attribute.Color;
+import org.blacksun.graph.channel.HalfDuplexChannelFactory;
 
 import java.util.HashMap;
 import java.util.function.Supplier;
@@ -28,6 +29,7 @@ public class Config {
         properties.put("ticks", 2000); // min ticks for a single test
         properties.put("delay", 50); // delay between messages appearance
         properties.put("amount", 10); // amount of appeared messages
+        properties.put("channelFactory", new HalfDuplexChannelFactory());
     }
 
     public static Config getConfig() {

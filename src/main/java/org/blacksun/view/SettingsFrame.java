@@ -1,6 +1,11 @@
 package org.blacksun.view;
 
 import guru.nidi.graphviz.attribute.Color;
+import org.blacksun.graph.channel.ChannelFactory;
+import org.blacksun.graph.channel.DuplexChannelFactory;
+import org.blacksun.graph.channel.HalfDuplexChannelFactory;
+import org.blacksun.graph.channel.SimplexChannelFactory;
+import org.blacksun.utils.Config;
 
 import javax.swing.*;
 
@@ -23,7 +28,7 @@ public class SettingsFrame extends JFrame {
         setContentPane(panel);
         createScroll("View width", "viewW", 400, 2000);
         createScroll("View height","viewH", 400, 2000);
-        createCheckBox("Resize graph?", "resize");
+        createResize();
         createScroll("Graph width", "graphW", 800, 10_000);
         createScroll("Graph height", "graphH", 800, 10_000);
 
@@ -32,6 +37,8 @@ public class SettingsFrame extends JFrame {
         createScroll("Package size", "package", 128, 2048, 128);
         createScroll("Message appearance delay", "delay", 1, 1000);
         createScroll("Message appearance amount", "amount", 1, 64);
+
+        createChannel();
 
         createColor("Node color", "node");
         createColor("Channel color", "channel");
@@ -43,6 +50,16 @@ public class SettingsFrame extends JFrame {
         pack();
     }
 
+    private void createChannel() {
+        add(new JLabel("Default channel"));
+        JComboBox<ChannelFactory> comboBox = new JComboBox<>(new ChannelFactory[] {
+                new SimplexChannelFactory(), new HalfDuplexChannelFactory(), new DuplexChannelFactory()
+        });
+        comboBox.setSelectedItem(cfg.<ChannelFactory>getProperty("channelFactory"));
+        comboBox.addItemListener(e -> cfg.setProperty("channelFactory", comboBox.getSelectedItem()));
+        add(comboBox);
+    }
+
     private void createColor(String name, String cfgName) {
         add(new JLabel(name));
         JComboBox<Color> comboBox = new JComboBox<>(colors);
@@ -51,10 +68,10 @@ public class SettingsFrame extends JFrame {
         add(comboBox);
     }
 
-    private void createCheckBox(String name, String cfgName) {
-        JCheckBox checkBox = new JCheckBox(name);
-        checkBox.setSelected(cfg.getBoolean(cfgName));
-        checkBox.addChangeListener(e -> cfg.setProperty(cfgName, checkBox.isSelected()));
+    private void createResize() {
+        JCheckBox checkBox = new JCheckBox("Resize graph?");
+        checkBox.setSelected(cfg.getBoolean("resize"));
+        checkBox.addChangeListener(e -> cfg.setProperty("resize", checkBox.isSelected()));
         add(checkBox);
     }
 
@@ -63,11 +80,16 @@ public class SettingsFrame extends JFrame {
     }
 
     private void createScroll(String name, String cfgName, int min, int max, int increment) {
-        add(new JLabel(name));
+        JLabel label = new JLabel(name);
+        add(label);
         JSlider slider = new JSlider(min, max);
-        slider.setValue(cfg.getInt(cfgName));
         slider.createStandardLabels(increment);
-        slider.addChangeListener(e -> cfg.setProperty(cfgName, slider.getValue()));
+        slider.addChangeListener(e -> {
+            int value = slider.getValue();
+            cfg.setProperty(cfgName, value);
+            label.setText(name + " (" + value + ")");
+        });
+        slider.setValue(cfg.getInt(cfgName));
         add(slider);
     }
 }

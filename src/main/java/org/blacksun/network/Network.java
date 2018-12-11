@@ -11,7 +11,7 @@ import org.blacksun.graph.algorithms.PathFindingAlgorithmFactory;
 import org.blacksun.graph.channel.Channel;
 import org.blacksun.graph.node.GraphNode;
 import org.blacksun.utils.StringRepresentable;
-import org.blacksun.view.Config;
+import org.blacksun.utils.Config;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -44,9 +44,13 @@ public class Network implements StringRepresentable {
     }
 
     public Network(@NotNull Topology topology, PathFindingAlgorithmFactory factory) {
-        nodes = topology.createNetwork();
         this.topology = topology;
         this.factory = factory;
+        generateNetwork();
+    }
+
+    public void generateNetwork() {
+        nodes = topology.createNetwork();
         openConnections = new ArrayList<>();
     }
 

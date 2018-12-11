@@ -8,4 +8,9 @@ public class SimplexChannelFactory implements ChannelFactory {
     public Channel createChannel(@NotNull GraphNode from, @NotNull GraphNode to, int weight, double errors) {
         return new SimplexChannel(from, to, weight, errors);
     }
+
+    @Override
+    public String toString() {
+        return "Simplex";
+    }
 }
