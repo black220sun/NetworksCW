@@ -44,10 +44,10 @@ public class NetworkSummary {
         int messageSize = cfg.getInt("message");
         RandomGenerator random = new RandomGenerator((int) (messageSize * 1.5),
                 (int) (messageSize * 0.5));
-        GraphNode fromNode = network.getRandomNode();
+        GraphNode fromNode = network.getRandomNode(true);
         GraphNode toNode;
         do {
-            toNode = network.getRandomNode();
+            toNode = network.getRandomNode(true);
         } while (fromNode.equals(toNode));
         int sending = random.next();
         logger.info("Sending " + sending + " bytes from " + fromNode + " to " + toNode);
@@ -57,6 +57,10 @@ public class NetworkSummary {
                 waiting.add(new Pair<>(new Pair<>(fromNode, toNode), packageSize));
                 sending -= packageSize;
             }
+        } else {
+            // channel initiation
+            bytesSent += cfg.getInt("utility");
+            packagesSent++;
         }
         waiting.add(new Pair<>(new Pair<>(fromNode, toNode), sending));
         messagesSent++;
@@ -97,7 +101,7 @@ public class NetworkSummary {
             int newLeft = pair.getSecond() - 1;
             GraphPath path = pair.getFirst();
             if (datagram) {
-                path.close(newLeft);
+                updated = path.close(newLeft);
             }
             if (newLeft > 0) {
                 newToSend.add(new Pair<>(path, newLeft));

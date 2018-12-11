@@ -16,7 +16,7 @@ public class SimpleTopologyTest {
 
     @Before
     public void init() {
-        topology = new SimpleTopology(NODES, ORDER, new WeightList(1), new NamedGraphNodeFactory());
+        topology = new SimpleTopology(NODES, ORDER, 1, new WeightList(1), new NamedGraphNodeFactory());
     }
 
     @Test

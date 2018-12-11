@@ -26,10 +26,10 @@ public class Main {
     }
 
     private static Network initNetwork() {
-        WeightList weights = new WeightList(2, 3, 5, 7, 12);
+        WeightList weights = new WeightList(2, 3, 6, 8, 9, 11, 12, 15, 17, 19, 21, 24, 27);
         Config.getConfig().setProperty("weights", weights);
         GraphNodeFactory nodeFactory = new SimpleNodeFactory("Node");
-        Topology topology = new SimpleTopology(30, 3, weights, nodeFactory);
+        Topology topology = new SimpleTopology(30, 3, 2, weights, nodeFactory);
         PathFindingAlgorithmFactory factory = new BFAlgorithmFactory();
 
         return new Network(topology, factory);

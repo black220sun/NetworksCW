@@ -14,10 +14,12 @@ public class NamedGraphNode implements GraphNode {
     private final ChannelFactory factory;
     private List<Channel> connections;
     private boolean selected;
+    private boolean terminal;
 
     NamedGraphNode(@NotNull String name, @NotNull ChannelFactory factory) {
         this.name = name;
         this.factory = factory;
+        terminal = false;
         connections = new ArrayList<>();
     }
 
@@ -78,6 +80,16 @@ public class NamedGraphNode implements GraphNode {
     @Override
     public void removeConnection(@NotNull Channel channel) {
         connections.remove(channel);
+    }
+
+    @Override
+    public boolean isTerminal() {
+        return terminal;
+    }
+
+    @Override
+    public void setTerminal(boolean value) {
+        terminal = value;
     }
 
     @Override

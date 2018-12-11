@@ -15,10 +15,6 @@ public class SettingsFrame extends JFrame {
             Color.BLACK, Color.BLUE, Color.RED, Color.GREEN, Color.YELLOW, Color.BROWN,
             Color.CYAN, Color.MAGENTA, Color.GRAY, Color.VIOLET, Color.PURPLE, Color.ORANGE
     };
-    private final String[] colorNames = new String[] {
-            "BLACK", "BLUE", "RED", "GREEN", "YELLOW", "BROWN",
-            "CYAN", "MAGENTA", "GRAY", "VIOLET", "PURPLE", "ORANGE"
-    };
 
     public SettingsFrame(){
         super("Settings");
@@ -44,6 +40,7 @@ public class SettingsFrame extends JFrame {
         createColor("Channel color", "channel");
         createColor("Selected node color", "selectedN");
         createColor("Selected channel color", "selectedC");
+        createColor("Terminal node color", "terminal");
         createColor("Connected channel color", "connected");
 
         setVisible(true);

@@ -18,9 +18,9 @@ import java.util.stream.Collectors;
 public class ToolbarPanel extends JPanel {
     private final NetworkPanel networkPanel;
     private final Network network;
+    private final JCheckBox terminal;
     private final JComboBox<GraphNode> fromNode;
     private final JComboBox<GraphNode> toNode;
-    private final JTextField text;
     private final JLabel timeLabel;
     private final JTextArea infoArea;
     private int time;
@@ -30,15 +30,12 @@ public class ToolbarPanel extends JPanel {
         this.networkPanel = panel;
         network = panel.getNetwork();
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-        GraphNode[] nodes = network.getNodes().toArray(new GraphNode[]{});
+        GraphNode[] nodes = network.getNodes(true).toArray(new GraphNode[]{});
         fromNode = new JComboBox<>(nodes);
         toNode = new JComboBox<>(nodes);
-        text = new JTextField();
-        text.setPreferredSize(new Dimension(128, 24));
+        terminal = new JCheckBox("Terminal", true);
         addNodePanel();
-        add(text);
         addChangePanel();
-        addSettingsPanel();
         addInfoPanel();
         timeLabel = new JLabel("0");
         addTimePanel();
@@ -47,22 +44,35 @@ public class ToolbarPanel extends JPanel {
         add(infoArea);
     }
 
-    private void addSettingsPanel() {
-        JPanel panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
-        panel.add(createButton("Settings", e -> new SettingsFrame()));
-        panel.add(createButton("Update", e -> networkPanel.update()));
-        add(panel);
-    }
-
     private void addInfoPanel() {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+        panel.add(createButton("Remove all", e -> {
+            network.clear();
+            updateNodes();
+            terminal.setSelected(false);
+            networkPanel.update();
+        }));
+        panel.add(createButton("Generate", e -> {
+            Config.getConfig().setProperty("counter", 0);
+            network.generateNetwork();
+            updateNodes();
+            networkPanel.update();
+        }));
         panel.add(createButton("Show table", e -> {
             GraphNode node = (GraphNode) fromNode.getSelectedItem();
             infoArea.setText(network.getPaths(node).stream()
                     .map(GraphPath::toString)
                     .collect(Collectors.joining("\n")));
+        }));
+        panel.add(createButton("Run test", e -> {
+            infoArea.setText("");
+            network.closeAll();
+            infoArea.setText("\t" + NetworkSummary.getConfigOptions() +
+                    "\n\tVIRTUAL CHANNEL MODE " +
+                    new NetworkSummary(network).runTests(false) +
+                    "\n\tDATAGRAM MODE " +
+                    new NetworkSummary(network).runTests(true));
         }));
         panel.add(createButton("Clear", e -> infoArea.setText("")));
         add(panel);
@@ -81,62 +91,19 @@ public class ToolbarPanel extends JPanel {
             time += network.getPath(n1, n2, true).getWeight();
             timeLabel.setText(String.valueOf(time));
         })));
-        panel.add(createButton("Run test", e -> {
-            infoArea.setText("");
-            infoArea.setText("\t" + NetworkSummary.getConfigOptions() +
-                    "\n\tVIRTUAL CHANNEL MODE " +
-                    new NetworkSummary(network).runTests(false) +
-                    "\n\tDATAGRAM MODE " +
-                    new NetworkSummary(network).runTests(true));
-        }));
+        panel.add(createButton("Settings", e -> new SettingsFrame()));
+        panel.add(createButton("Update", e -> networkPanel.update()));
         add(panel);
     }
 
     private void addChangePanel() {
         JPanel pane = new JPanel();
         pane.setLayout(new BoxLayout(pane, BoxLayout.X_AXIS));
-        pane.add(createButton("Add", e -> {
-            GraphNode node = network.addNode();
-            fromNode.addItem(node);
-            toNode.addItem(node);
-            networkPanel.update();
-        }));
-        pane.add(createButton("Remove", nodeAction((node, n) -> {
-            network.removeNode(node);
-            fromNode.removeItem(node);
-            toNode.removeItem(node);
+        pane.add(createButton("Terminal", nodeAction((n1, n2) -> {
+            n1.setTerminal(!n1.isTerminal());
+            updateNodes();
         })));
-        pane.add(createButton("Rename", nodeAction((node, n) -> {
-            String name = text.getText();
-            if (!name.isEmpty() && node instanceof NamedGraphNode) {
-                ((NamedGraphNode) node).setName(name);
-            }
-        })));
-        pane.add(createButton("Link", nodeAction((n1, n2) -> {
-            Config cfg = Config.getConfig();
-            int weight = cfg.<WeightList>getProperty("weights").getWeight();
-            cfg.<ChannelFactory>getProperty("channelFactory").createChannel(n1, n2, weight);
-        })));
-        pane.add(createButton("Unlink", nodeAction(network::removeConnection)));
-        pane.add(createButton("Generate", e -> {
-            Config.getConfig().setProperty("counter", 0);
-            network.generateNetwork();
-            fromNode.removeAllItems();
-            toNode.removeAllItems();
-            network.getNodes().forEach(node -> { fromNode.addItem(node); toNode.addItem(node); });
-            networkPanel.update();
-        }));
-        add(pane);
-    }
-
-    private void addNodePanel() {
-        JPanel panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
-        panel.add(fromNode);
-        panel.add(toNode);
-        panel.add(createButton("Connect", nodeAction(network::createConnection)));
-        panel.add(createButton("Disconnect", nodeAction(network::closeConnection)));
-        panel.add(createButton("Select", nodeAction((from, to) -> {
+        pane.add(createButton("Select", nodeAction((from, to) -> {
             boolean current = from.isSelected();
             if (current == to.isSelected()) {
                 boolean changed = !current;
@@ -145,9 +112,36 @@ public class ToolbarPanel extends JPanel {
                 to.setSelected(changed);
             }
         })));
+        pane.add(createButton("Add", e -> {
+            network.addNode();
+            updateNodes();
+            networkPanel.update();
+        }));
+        pane.add(createButton("Remove", nodeAction((node, n) -> {
+            network.removeNode(node);
+            updateNodes();
+        })));
+        pane.add(createButton("Link", nodeAction((n1, n2) -> {
+            Config cfg = Config.getConfig();
+            int weight = cfg.<WeightList>getProperty("weights").getWeight();
+            cfg.<ChannelFactory>getProperty("channelFactory").createChannel(n1, n2, weight);
+        })));
+        pane.add(createButton("Unlink", nodeAction(network::removeConnection)));
+        add(pane);
+    }
+
+    private void addNodePanel() {
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+        panel.add(terminal);
+        terminal.addChangeListener(e -> updateNodes());
+        panel.add(fromNode);
+        panel.add(toNode);
+        panel.add(createButton("Connect", nodeAction(network::createConnection)));
+        panel.add(createButton("Disconnect", nodeAction(network::closeConnection)));
         panel.add(createButton("Close all", e -> {
             network.closeAll();
-            this.networkPanel.update();
+            networkPanel.update();
         }));
         add(panel);
     }
@@ -156,6 +150,15 @@ public class ToolbarPanel extends JPanel {
         JButton button = new JButton(name);
         button.addActionListener(action);
         return button;
+    }
+
+    private void updateNodes() {
+        fromNode.removeAllItems();
+        toNode.removeAllItems();
+        network.getNodes(terminal.isSelected()).forEach(node -> {
+            fromNode.addItem(node);
+            toNode.addItem(node);
+        });
     }
 
     private ActionListener nodeAction(BiConsumer<GraphNode, GraphNode> consumer) {

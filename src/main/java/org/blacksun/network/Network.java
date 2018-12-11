@@ -58,7 +58,20 @@ public class Network implements StringRepresentable {
         return nodes;
     }
 
+    public List<GraphNode> getNodes(boolean terminal) {
+        if (!terminal)
+            return nodes;
+        return nodes.stream()
+                .filter(GraphNode::isTerminal)
+                .collect(Collectors.toList());
+    }
+
     public GraphNode getRandomNode() {
+        return nodes.get(new Random().nextInt(nodes.size()));
+    }
+
+    public GraphNode getRandomNode(boolean terminal) {
+        List<GraphNode> nodes = getNodes(terminal);
         return nodes.get(new Random().nextInt(nodes.size()));
     }
 
@@ -144,7 +157,10 @@ public class Network implements StringRepresentable {
     }
 
     public void removeNode(@NotNull GraphNode node) {
-        node.getConnections().forEach(ch -> node.removeConnectedNode(ch.getToNode()));
+        Channel[] connections = node.getConnections().toArray(new Channel[]{});
+        for (Channel ch: connections) {
+            ch.remove();
+        }
         nodes.remove(node);
     }
 
@@ -194,6 +210,8 @@ public class Network implements StringRepresentable {
                 .setDirected(true);
         nodes.forEach(node -> {
             Color color = cfg.getColor("node");
+            if (node.isTerminal())
+                color = cfg.getColor("terminal");
             if (node.isSelected())
                 color = cfg.getColor("selectedN");
             map.put(node, mutNode(node.toString()).add(color));
@@ -223,5 +241,10 @@ public class Network implements StringRepresentable {
 
     public void closeAll() {
         getChannels(true).forEach(ch -> ch.setUsed(false));
+    }
+
+    public void clear() {
+        nodes.clear();
+        openConnections.clear();
     }
 }

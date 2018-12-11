@@ -23,12 +23,14 @@ public class Config {
         properties.put("selectedN", Color.BLUE);
         properties.put("selectedC", Color.BLUE);
         properties.put("connected", Color.RED);
+        properties.put("terminal", Color.ORANGE);
+        properties.put("utility", 32); // package for VC initiation
         properties.put("package", 256); // package size
         properties.put("message", 1024); // average message size (+/- 50%)
         //properties.put("render", true);
         properties.put("ticks", 2000); // min ticks for a single test
-        properties.put("delay", 50); // delay between messages appearance
-        properties.put("amount", 10); // amount of appeared messages
+        properties.put("delay", 25); // delay between messages appearance
+        properties.put("amount", 1); // amount of appeared messages
         properties.put("channelFactory", new HalfDuplexChannelFactory());
     }
 

@@ -17,5 +17,7 @@ public interface GraphNode extends StringRepresentable, Selectable {
     Channel addConnection(@NotNull Channel channel);
     void removeConnectedNode(@NotNull GraphNode node);
     void removeConnection(@NotNull Channel channel);
+    boolean isTerminal();
+    void setTerminal(boolean value);
     int getOrder();
 }

@@ -15,8 +15,9 @@ public class SimpleTopology implements Topology {
     private final int lower;
     private final WeightList weights;
     private final GraphNodeFactory factory;
+    private final int terminal;
 
-    public SimpleTopology(int amount, double order,
+    public SimpleTopology(int amount, double order, int terminal,
                           @NotNull WeightList weights, @NotNull GraphNodeFactory factory) {
         if (amount < 0)
             throw new IllegalArgumentException("Amount must be non-negative");
@@ -27,6 +28,7 @@ public class SimpleTopology implements Topology {
         lower = this.order > 1 ? 1 : 0;
         this.weights = weights;
         this.factory = factory;
+        this.terminal = terminal;
     }
 
     @Override
@@ -34,7 +36,11 @@ public class SimpleTopology implements Topology {
         List<GraphNode> nodes = new ArrayList<>();
         // create all nodes
         for (int i = 0; i < amount; ++i) {
-            nodes.add(factory.createNode());
+            GraphNode node = factory.createNode();
+            if (i % terminal == 0) {
+                node.setTerminal(true);
+            }
+            nodes.add(node);
         }
         RandomGenerator orderGen = new RandomGenerator(order, lower);
         RandomGenerator indexGen = new RandomGenerator(amount);
