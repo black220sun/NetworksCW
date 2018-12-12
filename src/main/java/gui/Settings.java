@@ -12,20 +12,20 @@ public class Settings extends JFrame {
     private final PropertiesHandler cfg = PropertiesHandler.getProps();
 
     public Settings(){
-        super("Settings");
+        super("Налаштування");
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         setContentPane(panel);
 
-        createScroll("Graph width", "graphW", 800, 10_000);
-        createScroll("Graph height", "graphH", 800, 10_000);
+        createScroll("Ширина графа", "graphW", 800, 10_000);
+        createScroll("Висота графа", "graphH", 800, 10_000);
 
-        createScroll("Min ticks for test", "ticks", 100, 10_000);
-        createScroll("Average message size", "message", 256, 8192, 512);
-        createScroll("Package size", "package", 128, 2048, 128);
-        createScroll("Message appearance delay", "delay", 1, 1000);
-        createScroll("Message appearance amount", "amount", 1, 64);
+        createScroll("час генерації по-ння", "ticks", 100, 10_000);
+        createScroll("Середній розмір по-ння", "message", 256, 8192, 512);
+        createScroll("Розмір пакету", "package", 128, 2048, 128);
+        createScroll("затримка між по-нням", "delay", 1, 1000);
+        createScroll("Кількість одночасних по-нь", "amount", 1, 64);
 
         createChannel();
 
@@ -34,7 +34,7 @@ public class Settings extends JFrame {
     }
 
     private void createChannel() {
-        add(new JLabel("Default edge"));
+        add(new JLabel("Тип зв'язка"));
         JComboBox<ChannelFactory> comboBox = new JComboBox<>(new ChannelFactory[] {
                 new SimplexChannelFactory(), new HalfDuplexChannelFactory(), new DuplexChannelFactory()
         });

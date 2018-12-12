@@ -172,9 +172,8 @@ public class Network implements Stringable {
     }
 
     public void removeConnection(@NotNull Vertex from, @NotNull Vertex to) {
-        if (exists(from, to)) {
-            from.removeConnectedNode(to);
-        }
+        from.removeConnectedNode(to);
+
     }
 
     private boolean exists(Vertex... nodes) {
