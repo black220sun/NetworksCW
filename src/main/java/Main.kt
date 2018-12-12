@@ -13,7 +13,7 @@ import java.util.logging.SimpleFormatter
 object Main {
     @JvmStatic
     fun main(args: Array<String>) {
-        initLogger()
+        //initLogger()
 
         /* change options before creating frame */
         // Config cfg = Config.getConfig();
