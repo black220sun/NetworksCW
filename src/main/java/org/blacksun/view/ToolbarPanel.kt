@@ -39,6 +39,7 @@ class ToolbarPanel(private val networkPanel: NetworkPanel) : JPanel() {
         val panel = JPanel()
         panel.layout = BoxLayout(panel, BoxLayout.X_AXIS)
         panel.add(createButton("Remove all") {
+            Config.config.setProperty("counter", 0)
             network.clear()
             updateNodes()
             terminal.isSelected = false
@@ -47,6 +48,7 @@ class ToolbarPanel(private val networkPanel: NetworkPanel) : JPanel() {
         panel.add(createButton("Generate") {
             Config.config.setProperty("counter", 0)
             network.generateNetwork()
+            terminal.isSelected = true
             updateNodes()
             networkPanel.update()
         })

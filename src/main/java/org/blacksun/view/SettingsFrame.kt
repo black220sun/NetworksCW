@@ -9,7 +9,11 @@ import javax.swing.*
 
 class SettingsFrame : JFrame("Settings") {
     private val cfg = Config.config
-    private val colors = arrayOf(Color.BLACK, Color.BLUE, Color.RED, Color.GREEN, Color.YELLOW, Color.BROWN, Color.CYAN, Color.MAGENTA, Color.GRAY, Color.VIOLET, Color.PURPLE, Color.ORANGE)
+    private val colors = arrayOf(Color.BLACK, Color.BLUE, Color.RED, Color.GREEN,
+            Color.YELLOW, Color.BROWN, Color.CYAN, Color.MAGENTA,
+            Color.GRAY, Color.VIOLET, Color.PURPLE, Color.ORANGE)
+    private val colorNames = arrayOf("BLACK", "BLUE", "RED", "GREEN", "YELLOW",
+            "BROWN", "CYAN", "MAGENTA", "GRAY", "VIOLET", "PURPLE", "ORANGE")
 
     init {
         defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
@@ -45,22 +49,26 @@ class SettingsFrame : JFrame("Settings") {
         add(JLabel("Default channel"))
         val comboBox = JComboBox(arrayOf(SimplexChannelFactory(), HalfDuplexChannelFactory(), DuplexChannelFactory()))
         comboBox.selectedItem = cfg.getProperty("channelFactory")
-        comboBox.addItemListener { e -> cfg.setProperty("channelFactory", comboBox.selectedItem) }
+        comboBox.addItemListener {
+            cfg.setProperty("channelFactory", comboBox.selectedItem)
+        }
         add(comboBox)
     }
 
     private fun createColor(name: String, cfgName: String) {
         add(JLabel(name))
-        val comboBox = JComboBox(colors)
-        comboBox.selectedItem = cfg.getColor(cfgName)
-        comboBox.addItemListener { e -> cfg.setProperty(cfgName, comboBox.selectedItem) }
+        val comboBox = JComboBox(colorNames)
+        comboBox.selectedIndex = colors.indexOf(cfg.getColor(cfgName))
+        comboBox.addItemListener {
+            cfg.setProperty(cfgName, colors[comboBox.selectedIndex])
+        }
         add(comboBox)
     }
 
     private fun createResize() {
         val checkBox = JCheckBox("Resize graph?")
         checkBox.isSelected = cfg.getBoolean("resize")
-        checkBox.addChangeListener { e -> cfg.setProperty("resize", checkBox.isSelected) }
+        checkBox.addChangeListener { cfg.setProperty("resize", checkBox.isSelected) }
         add(checkBox)
     }
 
@@ -69,7 +77,7 @@ class SettingsFrame : JFrame("Settings") {
         add(label)
         val slider = JSlider(min, max)
         slider.createStandardLabels(increment)
-        slider.addChangeListener { e ->
+        slider.addChangeListener {
             val value = slider.value
             cfg.setProperty(cfgName, value)
             label.text = "$name ($value)"
