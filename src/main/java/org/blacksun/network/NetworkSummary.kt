@@ -60,7 +60,7 @@ class NetworkSummary(private val network: Network) {
                 }
             }
             toRemove.forEach { waiting.remove(it) }
-            updated = false
+            //updated = false
         }
     }
 

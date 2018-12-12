@@ -80,16 +80,15 @@ class GraphPath @JvmOverloads constructor(private val cycle: Boolean = false, pr
     // sending package in datagram mode
     fun close(weight: Int): Boolean {
         var sum = 0
-        var result = false
         for (i in links.indices.reversed()) {
             val channel = links[i]
             if (weight > sum) {
                 sum += channel.weight
             } else {
                 channel.isUsed = false
-                result = true
+                return true
             }
         }
-        return result
+        return false
     }
 }
