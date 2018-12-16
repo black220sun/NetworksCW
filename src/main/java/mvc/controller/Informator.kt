@@ -13,8 +13,8 @@ class Informator(private val network: Network) {
     private data class Result(
             var time: Int = 0,
             var packagesSent: Int = 0,
+            var utilitySent: Int = 0,
             var messagesSent: Int = 0,
-            var bytesSent: Int = 0,
             var createdConnections: Int = 0)
     private val logger: Logger = Logger.getGlobal()
     private val waiting: ArrayList<Pair<Pair<Node, Node>, Int>> = ArrayList()
@@ -41,9 +41,8 @@ class Informator(private val network: Network) {
                 sending -= packageSize
             }
         } else {
-            // channel initiation
-            peek.bytesSent += cfg.getInt("utility")
-            peek.packagesSent++
+            // channel initiation/confirm/close
+            peek.utilitySent += 3
         }
         waiting.add(Pair(Pair(fromNode, toNode), sending))
         peek.messagesSent++
@@ -74,7 +73,7 @@ class Informator(private val network: Network) {
         logger.info("Created $amount package(s). Time to deliver: $ticks ticks")
         val peek = results.peek()
         peek.packagesSent += amount
-        peek.bytesSent += messageSize
+        peek.utilitySent += amount
         peek.createdConnections += path.length
         return Pair(path, ticks)
     }
@@ -105,19 +104,18 @@ class Informator(private val network: Network) {
     private fun summary(): String {
         val resDG = results.pop()
         val resVC = results.pop()
-        val ticks = resVC.time.toDouble()
-        val msg = resVC.messagesSent.toDouble()
+        val packageSize = cfg.getInt("package")
+        val util = cfg.getInt("utility")
         val results =
-                "                      Вірт. канал                    Датаграмний режим\n" +
-                "Час роботи:         " + resVC.time + "\t" + resDG.time + "\n" +
-                "Повідомлень:        " + resVC.messagesSent + "\t" + resDG.messagesSent + "\n" +
-                "    (за 1 такт): " + resVC.messagesSent / ticks + "\t" + resDG.messagesSent / ticks + "\n" +
-                "Пакетів:            " + resVC.packagesSent + "\t" + resDG.packagesSent + "\n" +
-                "    (за 1 такт): " + resVC.packagesSent / ticks + "\t" + resDG.packagesSent / ticks + "\n" +
-                "    (на 1 пов.): " + resVC.packagesSent / msg + "\t" + resDG.packagesSent / msg + "\n" +
-                "Байтів:             " + resVC.bytesSent + "\t" + resDG.bytesSent + "\n" +
-                "    (за 1 такт): " + resVC.bytesSent / ticks + "\t" + resDG.bytesSent / ticks + "\n" +
-                "Каналів комутовано: " + resVC.createdConnections + "\t" + resDG.createdConnections
+                "                      \t\tBірт. канал\tДатаграмний режим\n" +
+                "Час роботи (такти):   \t" + resVC.time + "\t" + resDG.time + "\n" +
+                "Повідомлень:          \t" + resVC.messagesSent + "\t" + resDG.messagesSent + "\n" +
+                "Інформаційних пакетів:\t" + resVC.packagesSent + "\t" + resDG.packagesSent + "\n" +
+                "Службових пакетів:    \t" + resVC.utilitySent + "\t" + resDG.utilitySent + "\n" +
+                "Байтів даних:         \t" + (resVC.packagesSent * packageSize) +
+                        "\t" + (resDG.packagesSent * packageSize) + "\n" +
+                "Службових байтів:     \t" + (resVC.utilitySent * util) +
+                        "\t" + (resDG.utilitySent * util) + "\n"
         logger.info(results)
         return results
     }
@@ -156,8 +154,9 @@ class Informator(private val network: Network) {
 
         val configOptions: String
             get() = "Канал: " + cfg.getProperty("channelFactory") + "\n" +
-                    "Розмір повідомлення: " + cfg.getInt("message") + "\n" +
-                    "Розмір пакету: " + cfg.getInt("package") + "\n" +
-                    "Частота появи (такти): " + cfg.getInt("delay") + "\n"
+                    "Розмір повідомлення: " + cfg.getInt("message") + " байтів\n" +
+                    "Розмір інфор. пакету: " + cfg.getInt("package") + " байтів\n" +
+                    "Розмір служб. пакету: " + cfg.getInt("utility") + " байтів\n" +
+                    "Частота появи повідомлень: " + cfg.getInt("delay") + " тактів\n"
     }
 }

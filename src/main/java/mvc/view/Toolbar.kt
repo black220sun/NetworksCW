@@ -55,7 +55,7 @@ class Toolbar(private val networkPanel: NetworkPanel) : JPanel() {
         panel.add(createButton("Серія тестів") {
             infoArea.text = ""
             network.closeAll()
-            infoArea.text = "\t" + Informator.configOptions +
+            infoArea.text = Informator.configOptions +
                     Informator(network).runTests()
             Config.config.getProperty<JTabbedPane>("tab").selectedIndex = 2
         })

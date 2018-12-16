@@ -13,7 +13,7 @@ import java.util.logging.SimpleFormatter
 object Main {
     @JvmStatic
     fun main(args: Array<String>) {
-        //initLogger()
+        initLogger()
 
         /* change options before creating frame */
         // Config cfg = Config.getConfig();
@@ -33,7 +33,7 @@ object Main {
     private fun initLogger() {
         val handler = FileHandler("summary.log")
         handler.formatter = SimpleFormatter()
-        Logger.getGlobal().addHandler(handler)
+        //Logger.getGlobal().addHandler(handler)
         Logger.getGlobal().useParentHandlers = false
     }
 }

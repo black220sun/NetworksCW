@@ -27,7 +27,7 @@ class Config private constructor() {
         properties["message"] = 2048 // average message size (+/- 50%)
         //properties.put("render", true);
         properties["ticks"] = 1000 // min ticks for a single test
-        properties["delay"] = 10 // delay between messages appearance
+        properties["delay"] = 25 // delay between messages appearance
         properties["amount"] = 1 // amount of appeared messages
         properties["channelFactory"] = HalfDuplexChannelFactory()
     }
