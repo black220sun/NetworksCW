@@ -38,9 +38,9 @@ class NetworkSummary(private val network: Network) {
                 sending -= packageSize
             }
         } else {
-            // channel initiation
-            bytesSent += cfg.getInt("utility")
-            packagesSent++
+            // channel initiation/closing
+            bytesSent += cfg.getInt("utility") * 3
+            packagesSent += 3
         }
         waiting.add(Pair(Pair(fromNode, toNode), sending))
         messagesSent++
@@ -149,10 +149,10 @@ class NetworkSummary(private val network: Network) {
         val configOptions: String
             get() = "ENVIRONMENT\n" +
                     "Default channel type: " + cfg.getProperty("channelFactory") + "\n" +
-                    "Base time: " + cfg.getInt("ticks") + "\n" +
+                    "Base time: " + cfg.getInt("ticks") + " ticks\n" +
                     "Average message size: " + cfg.getInt("message") + "\n" +
-                    "Package size: " + cfg.getInt("package") + "\n" +
-                    "Message appearance delay: " + cfg.getInt("delay") + "\n" +
+                    "Package size: " + cfg.getInt("package") + " bytes\n" +
+                    "Message appearance delay: " + cfg.getInt("delay") + " ticks\n" +
                     "Message appearance amount: " + cfg.getInt("amount")
     }
 }
