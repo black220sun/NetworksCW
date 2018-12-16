@@ -61,7 +61,7 @@ class ToolbarPanel(private val networkPanel: NetworkPanel) : JPanel() {
             infoArea.text = ""
             network.closeAll()
             infoArea.text = "\t" + NetworkSummary.configOptions +
-                    "\n\tVIRTUAL CHANNEL MODE " +
+                    "\n\tLOGICAL CONNECTION MODE " +
                     NetworkSummary(network).runTests(false) +
                     "\n\tDATAGRAM MODE " +
                     NetworkSummary(network).runTests(true)

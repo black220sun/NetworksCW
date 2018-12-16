@@ -14,11 +14,13 @@ class NetworkSummary(private val network: Network) {
     private val waiting: ArrayList<Pair<Pair<GraphNode, GraphNode>, Int>> = ArrayList()
     private var updated = true
     private var toSend: ArrayList<Pair<GraphPath, Int>> = ArrayList()
-    private var time: Int = 0
-    private var packagesSent = 0
-    private var messagesSent = 0
-    private var bytesSent = 0
-    private var createdConnections = 0
+    private var time = 0L
+    private var packagesSent = 0L
+    private var utilityPackagesSent = 0L
+    private var messagesSent = 0L
+    private var bytesSent = 0L
+    private var utilityBytesSent = 0L
+    private var createdConnections = 0L
 
     private fun prepareMessage(datagram: Boolean) {
         val messageSize = cfg.getInt("message")
@@ -39,8 +41,7 @@ class NetworkSummary(private val network: Network) {
             }
         } else {
             // channel initiation/closing
-            bytesSent += cfg.getInt("utility") * 3
-            packagesSent += 3
+            utilityPackagesSent += 3
         }
         waiting.add(Pair(Pair(fromNode, toNode), sending))
         messagesSent++
@@ -70,6 +71,7 @@ class NetworkSummary(private val network: Network) {
         val ticks = amount * path.weight
         logger.info("Created $amount package(s). Time to deliver: $ticks ticks")
         packagesSent += amount
+        utilityPackagesSent += amount.toLong()
         bytesSent += messageSize
         createdConnections += path.length
         return Pair(path, ticks)
@@ -101,18 +103,26 @@ class NetworkSummary(private val network: Network) {
     private fun summary(): String {
         val ticks = time.toDouble()
         val msg = messagesSent.toDouble()
+        utilityBytesSent = cfg.getInt("utility") * utilityPackagesSent
+        bytesSent = cfg.getInt("package") * packagesSent
         val results = "SUMMARY\n" +
                 "Time spent: " + time + " ticks\n" +
                 "Messages sent: " + messagesSent + "\n" +
                 "Messages sent per tick: " + messagesSent / ticks + "\n" +
-                "Ticks per message: " + time / msg + "\n" +
-                "Packages sent: " + packagesSent + "\n" +
-                "Packages sent per tick: " + packagesSent / ticks + "\n" +
-                "Ticks per package: " + ticks / packagesSent + "\n" +
-                "Packages sent per message: " + packagesSent / msg + "\n" +
-                "Bytes sent: " + bytesSent + "\n" +
-                "Bytes sent per tick: " + bytesSent / ticks + "\n" +
-                "Bytes sent per message: " + bytesSent / msg + "\n" +
+                "Total packages sent: " + (packagesSent + utilityPackagesSent) + "\n" +
+                "Data packages sent: " + packagesSent + "\n" +
+                "Utility packages sent: " + utilityPackagesSent  + "\n" +
+                "Data packages sent per tick: " + packagesSent / ticks + "\n" +
+                "Utility packages sent per tick: " + utilityPackagesSent /ticks + "\n" +
+                "Data packages sent per message: " + packagesSent / msg + "\n" +
+                "Utility packages sent per message: " + utilityPackagesSent  / msg + "\n" +
+                "Total bytes sent: " + (bytesSent + utilityBytesSent) + "\n" +
+                "Data bytes sent: " + bytesSent + "\n" +
+                "Utility bytes sent: " + utilityBytesSent + "\n" +
+                "Data bytes sent per tick: " + bytesSent / ticks + "\n" +
+                "Utility bytes sent per tick: " + utilityBytesSent / ticks + "\n" +
+                "Data bytes sent per message: " + bytesSent / msg + "\n" +
+                "Utility bytes sent per message: " + utilityBytesSent / msg + "\n" +
                 "Connections created: " + createdConnections + "\n" +
                 "Connections created per tick: " + createdConnections / ticks + "\n" +
                 "Connections created per message: " + createdConnections / msg
@@ -152,6 +162,7 @@ class NetworkSummary(private val network: Network) {
                     "Base time: " + cfg.getInt("ticks") + " ticks\n" +
                     "Average message size: " + cfg.getInt("message") + "\n" +
                     "Package size: " + cfg.getInt("package") + " bytes\n" +
+                    "Utility package size: " + cfg.getInt("utility") + " bytes\n" +
                     "Message appearance delay: " + cfg.getInt("delay") + " ticks\n" +
                     "Message appearance amount: " + cfg.getInt("amount")
     }
