@@ -29,6 +29,7 @@ class SettingsFrame : JFrame("Settings") {
         createScroll("Min ticks for test", "ticks", 100, 10000)
         createScroll("Average message size", "message", 256, 8192, 512)
         createScroll("Package size", "package", 128, 2048, 128)
+        createScroll("Utility package size", "utility", 4, 256, 4)
         createScroll("Message appearance delay", "delay", 1, 1000)
         createScroll("Message appearance amount", "amount", 1, 64)
 
