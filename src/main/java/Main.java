@@ -11,10 +11,10 @@ import gui.MainFrame;
 
 public class Main {
     public static void main(String[] args) {
-        WeightList weights = new WeightList(3, 5, 6, 8, 10, 12, 17, 19, 20, 25, 27, 28);
+        WeightList weights = new WeightList(1, 2, 4, 5, 8, 11, 12, 13, 15, 17, 21, 23, 27);
         PropertiesHandler.getProps().setProperty("weights", weights);
         VertexFactory nodeFactory = new NodeFactory("");
-        Topology topology = new RegionalTopology(12, 3.0, 2, weights, nodeFactory);
+        Topology topology = new RegionalTopology(12, 2.5, 2, weights, nodeFactory);
         Factory factory = new PathFactory();
         new MainFrame(new Network(topology, factory));
     }
