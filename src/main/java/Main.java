@@ -1,4 +1,4 @@
-import graph.algorithm.DejkstraFactory;
+import graph.algorithm.PathFactory;
 import graph.algorithm.Factory;
 import graph.vertex.VertexFactory;
 import graph.vertex.NodeFactory;
@@ -15,7 +15,7 @@ public class Main {
         PropertiesHandler.getProps().setProperty("weights", weights);
         VertexFactory nodeFactory = new NodeFactory("");
         Topology topology = new RegionalTopology(12, 3.0, 2, weights, nodeFactory);
-        Factory factory = new DejkstraFactory();
+        Factory factory = new PathFactory();
         new MainFrame(new Network(topology, factory));
     }
 }

@@ -32,11 +32,11 @@ public class TestRunner {
     }
 
     public static String getConfigOptions() {
-        return "Тип каналу: " + cfg.getProperty("channelFactory") + "\n" +
-                "Середній розмір повідомлення: " + cfg.getInt("message") + " байтів\n" +
-                "Розмір інформаційного пакету: " + cfg.getInt("package") + " байтів\n" +
-                "Розмір службового пакету: " + cfg.getInt("utility") + " байтів\n" +
-                "Затримка генерації повідомлення: " + cfg.getInt("delay") + " тактів\n";
+        return "Channel type: " + cfg.getProperty("channelFactory") + "\n" +
+                "Message size: " + cfg.getInt("message") + " bytes\n" +
+                "Data package size: " + cfg.getInt("package") + " bytes\n" +
+                "Util package size: " + cfg.getInt("utility") + " bytes\n" +
+                "Message generation delay: " + cfg.getInt("delay") + " microseconds\n";
     }
 
     private void prepareMessage(boolean datagram) {
@@ -86,7 +86,7 @@ public class TestRunner {
         int size = cfg.getInt("package");
         int amount = (messageSize + size - 1) / size;
         int ticks = amount * path.getWeight();
-        logger.info("Created " + amount + " package(s). Time to deliver: " + ticks + " ticks");
+        logger.info("Created " + amount + " package(s). Time to deliver: " + ticks + " microseconds");
         packagesSent += amount;
         utilSent += amount;
         bytesSent += messageSize;
@@ -120,16 +120,15 @@ public class TestRunner {
     private String summary() {
         double ticks = time;
         bytesSent += cfg.getInt("utility") * utilSent;
-        String results = "Результати:\n" +
-                time + " тактів\nВідправлено:\n" +
-                messagesSent + " повідомлень\n" +
-                packagesSent + " інформаційних пакетів\n" +
-                utilSent + " службових пакетів\n" +
-                bytesSent + " байтів" + "\nШвидкість:\n" +
-                bytesSent / ticks + " байтів/такт" + "\n" +
-                messagesSent / ticks + " повідомлень/такт\n" +
-                packagesSent / ticks + " інф. пакетів/такт\n\n" +
-                createdConnections + " каналів використано\n";
+        String results = "Summary:\n" +
+                time + " microseconds\nSent:\n" +
+                messagesSent + " messages\n" +
+                packagesSent + " data packages\n" +
+                utilSent + " util packages\n" +
+                bytesSent + " microseconds\nData transfer speed:\n" +
+                bytesSent / ticks + " b/ms" + "\n" +
+                messagesSent / ticks + " messages/ms\n" +
+                packagesSent / ticks + " packages/ms\n\n";
         logger.info(results);
         return results;
     }

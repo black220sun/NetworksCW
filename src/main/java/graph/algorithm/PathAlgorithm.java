@@ -9,13 +9,13 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 
-public class DejkstraAlgorithm implements Algorithm {
+public class PathAlgorithm implements Algorithm {
     private final List<Vertex> nodes;
     private final List<Edge> links;
     private HashMap<Pair<Vertex, Integer>, Integer> flags;
     private HashMap<Pair<Vertex, Integer>, Vertex> pathMap;
 
-    public DejkstraAlgorithm(@NotNull List<Vertex> nodes, @NotNull List<Edge> links) {
+    public PathAlgorithm(@NotNull List<Vertex> nodes, @NotNull List<Edge> links) {
         this.nodes = nodes;
         this.links = links;
     }

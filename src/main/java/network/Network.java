@@ -5,7 +5,7 @@ import guru.nidi.graphviz.attribute.Label;
 import guru.nidi.graphviz.attribute.Style;
 import guru.nidi.graphviz.model.MutableGraph;
 import guru.nidi.graphviz.model.MutableNode;
-import graph.algorithm.DejkstraFactory;
+import graph.algorithm.PathFactory;
 import graph.algorithm.GraphPath;
 import graph.algorithm.Algorithm;
 import graph.algorithm.Factory;
@@ -41,7 +41,7 @@ public class Network implements Stringable {
     }
 
     public Network(@NotNull Topology topology) {
-        this(topology, new DejkstraFactory());
+        this(topology, new PathFactory());
     }
 
     public Network(@NotNull Topology topology, Factory factory) {

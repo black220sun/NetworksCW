@@ -40,22 +40,22 @@ public class Toolbar extends JPanel {
     }
 
     private void panel4() {
-        JPanel panel4 = new JPanel();
-        panel4.setLayout(new BoxLayout(panel4, BoxLayout.X_AXIS));
-        panel4.add(createButton("Налаштування", e -> new Settings()));
-        add(panel4);
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+        panel.add(createButton("Settings", e -> new Settings()));
+        add(panel);
     }
 
     private void panel3() {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
-        panel.add(createButton("Зв'язати", nodeAction(network::createConnection)));
-        panel.add(createButton("Роз'єднання", nodeAction(network::closeConnection)));
-        panel.add(createButton("Роз'єднати всі", e -> {
+        panel.add(createButton("Connect", nodeAction(network::createConnection)));
+        panel.add(createButton("Disconnect", nodeAction(network::closeConnection)));
+        panel.add(createButton("Disconnect all", e -> {
             network.closeAll();
             networkPanel.update();
         }));
-        panel.add(createButton("Таблиця", e -> {
+        panel.add(createButton("Routing table", e -> {
             Vertex node = (Vertex) fromNode.getSelectedItem();
             infoArea.setText(network.getPaths(node).stream()
                     .map(GraphPath::toString)
@@ -67,25 +67,25 @@ public class Toolbar extends JPanel {
     private void panel2() {
         JPanel pane = new JPanel();
         pane.setLayout(new BoxLayout(pane, BoxLayout.X_AXIS));
-        pane.add(createButton("Термінал", nodeAction((n1, n2) -> {
+        pane.add(createButton("Add/remove station", nodeAction((n1, n2) -> {
             n1.setTerminal(!n1.isTerminal());
             updateNodes();
         })));
-        pane.add(createButton("Додати", e -> {
+        pane.add(createButton("Add node", e -> {
             network.addNode();
             updateNodes();
             networkPanel.update();
         }));
-        pane.add(createButton("Видалити", nodeAction((node, n) -> {
+        pane.add(createButton("Remove node", nodeAction((node, n) -> {
             network.removeNode(node);
             updateNodes();
         })));
-        pane.add(createButton("Створити канал", nodeAction((n1, n2) -> {
+        pane.add(createButton("Add channel", nodeAction((n1, n2) -> {
             PropertiesHandler cfg = PropertiesHandler.getProps();
             int weight = cfg.<WeightList>getProperty("weights").getWeight();
             cfg.<ChannelFactory>getProperty("channelFactory").createChannel(n1, n2, weight);
         })));
-        pane.add(createButton("Роз'єднати канал", nodeAction(network::removeConnection)));
+        pane.add(createButton("Remove channel", nodeAction(network::removeConnection)));
         add(pane);
     }
 
@@ -94,24 +94,24 @@ public class Toolbar extends JPanel {
         panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
         panel.add(fromNode);
         panel.add(toNode);
-        panel.add(createButton("Видалити все", e -> {
+        panel.add(createButton("Remove all", e -> {
             network.clear();
             updateNodes();
             networkPanel.update();
         }));
-        panel.add(createButton("Згенерувати", e -> {
+        panel.add(createButton("Generate new network", e -> {
             PropertiesHandler.getProps().setProperty("counter", 0);
             network.generateNetwork();
             updateNodes();
             networkPanel.update();
         }));
-        panel.add(createButton("Запустити тести", e -> {
+        panel.add(createButton("Test all", e -> {
             infoArea.setText("");
             network.closeAll();
             infoArea.setText(TestRunner.getConfigOptions() +
-                    "\nВіртуальний канал\n" +
+                    "\nVirtual channel\n" +
                     new TestRunner(network).runTests(false) +
-                    "\nДейтаграмний режим\n" +
+                    "\nDatagram mode\n" +
                     new TestRunner(network).runTests(true));
         }));
         add(panel);
