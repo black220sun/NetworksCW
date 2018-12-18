@@ -17,7 +17,7 @@ class Config private constructor() {
         properties["graphH"] = 980
         properties["resize"] = true
         properties["node"] = Color.GREEN
-        properties["channel"] = Color.AQUAMARINE
+        properties["channel"] = Color.BLACK
         properties["selectedN"] = Color.RED
         properties["selectedC"] = Color.PINK
         properties["connected"] = Color.BLUE
