@@ -18,6 +18,7 @@ public class TestRunner {
     private ArrayList<Pair<GraphPath, Integer>> toSend;
     private int time;
     private int packagesSent = 0;
+    private int utilSent = 0;
     private int messagesSent = 0;
     private int bytesSent = 0;
     private int createdConnections = 0;
@@ -31,10 +32,11 @@ public class TestRunner {
     }
 
     public static String getConfigOptions() {
-        return "Default channel type: " + cfg.getProperty("channelFactory") + "\n" +
-                "Average message size: " + cfg.getInt("message") + "\n" +
-                "Package size: " + cfg.getInt("package") + "\n" +
-                "Message appearance delay: " + cfg.getInt("delay") + "\n";
+        return "Тип каналу: " + cfg.getProperty("channelFactory") + "\n" +
+                "Середній розмір повідомлення: " + cfg.getInt("message") + " байтів\n" +
+                "Розмір інформаційного пакету: " + cfg.getInt("package") + " байтів\n" +
+                "Розмір службового пакету: " + cfg.getInt("utility") + " байтів\n" +
+                "Затримка генерації повідомлення: " + cfg.getInt("delay") + " тактів\n";
     }
 
     private void prepareMessage(boolean datagram) {
@@ -56,8 +58,7 @@ public class TestRunner {
             }
         } else {
             // edge initiation
-            bytesSent += cfg.getInt("utility");
-            packagesSent++;
+            utilSent += 4;
         }
         waiting.add(new Pair<>(new Pair<>(fromNode, toNode), sending));
         messagesSent++;
@@ -87,6 +88,7 @@ public class TestRunner {
         int ticks = amount * path.getWeight();
         logger.info("Created " + amount + " package(s). Time to deliver: " + ticks + " ticks");
         packagesSent += amount;
+        utilSent += amount;
         bytesSent += messageSize;
         createdConnections += path.getLength();
         return new Pair<>(path, ticks);
@@ -117,16 +119,17 @@ public class TestRunner {
 
     private String summary() {
         double ticks = time;
-        double msg = messagesSent;
-        String results = "Result\n" +
-                time + " ticks\nSent:\n" +
-                messagesSent + " messages" + "\n" +
-                packagesSent + " packages" + "\n" +
-                bytesSent + " bytes" + "\nSpeed:\n" +
-                bytesSent / ticks + " bytes/tick" + "\n" +
-                packagesSent / ticks + " packages/tick" + "\n" +
-                messagesSent / ticks + " messages/tick" + "\n\n" +
-                createdConnections + " channels used\n";
+        bytesSent += cfg.getInt("utility") * utilSent;
+        String results = "Результати:\n" +
+                time + " тактів\nВідправлено:\n" +
+                messagesSent + " повідомлень\n" +
+                packagesSent + " інформаційних пакетів\n" +
+                utilSent + " службових пакетів\n" +
+                bytesSent + " байтів" + "\nШвидкість:\n" +
+                bytesSent / ticks + " байтів/такт" + "\n" +
+                messagesSent / ticks + " повідомлень/такт\n" +
+                packagesSent / ticks + " інф. пакетів/такт\n\n" +
+                createdConnections + " каналів використано\n";
         logger.info(results);
         return results;
     }

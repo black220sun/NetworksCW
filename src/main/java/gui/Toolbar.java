@@ -109,9 +109,9 @@ public class Toolbar extends JPanel {
             infoArea.setText("");
             network.closeAll();
             infoArea.setText(TestRunner.getConfigOptions() +
-                    "\nVirtual chanel\n" +
+                    "\nВіртуальний канал\n" +
                     new TestRunner(network).runTests(false) +
-                    "\nDatagram mode\n" +
+                    "\nДейтаграмний режим\n" +
                     new TestRunner(network).runTests(true));
         }));
         add(panel);
