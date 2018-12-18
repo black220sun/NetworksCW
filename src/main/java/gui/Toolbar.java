@@ -43,7 +43,6 @@ public class Toolbar extends JPanel {
         JPanel panel4 = new JPanel();
         panel4.setLayout(new BoxLayout(panel4, BoxLayout.X_AXIS));
         panel4.add(createButton("Налаштування", e -> new Settings()));
-        panel4.add(createButton("Оновлення", e -> networkPanel.update()));
         add(panel4);
     }
 
@@ -51,8 +50,8 @@ public class Toolbar extends JPanel {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
         panel.add(createButton("Зв'язати", nodeAction(network::createConnection)));
-        panel.add(createButton("Розірвати", nodeAction(network::closeConnection)));
-        panel.add(createButton("Закрити всі", e -> {
+        panel.add(createButton("Роз'єднання", nodeAction(network::closeConnection)));
+        panel.add(createButton("Роз'єднати всі", e -> {
             network.closeAll();
             networkPanel.update();
         }));
@@ -86,7 +85,7 @@ public class Toolbar extends JPanel {
             int weight = cfg.<WeightList>getProperty("weights").getWeight();
             cfg.<ChannelFactory>getProperty("channelFactory").createChannel(n1, n2, weight);
         })));
-        pane.add(createButton("Розірвати канал", nodeAction(network::removeConnection)));
+        pane.add(createButton("Роз'єднати канал", nodeAction(network::removeConnection)));
         add(pane);
     }
 

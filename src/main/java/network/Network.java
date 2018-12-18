@@ -67,21 +67,9 @@ public class Network implements Stringable {
                 .collect(Collectors.toList());
     }
 
-    public Vertex getRandomNode() {
-        return nodes.get(new Random().nextInt(nodes.size()));
-    }
-
     public Vertex getRandomNode(boolean terminal) {
         List<Vertex> nodes = getNodes(terminal);
         return nodes.get(new Random().nextInt(nodes.size()));
-    }
-
-    public Factory getFactory() {
-        return factory;
-    }
-
-    public void setFactory(Factory factory) {
-        this.factory = factory;
     }
 
     public GraphPath getPath(@NotNull Vertex from, @NotNull Vertex to) {
@@ -151,24 +139,12 @@ public class Network implements Stringable {
         return node;
     }
 
-    public void addNode(@NotNull Vertex node) {
-        if (!exists(node)) {
-            nodes.add(node);
-        }
-    }
-
     public void removeNode(@NotNull Vertex node) {
         Edge[] connections = node.getConnections().toArray(new Edge[]{});
         for (Edge ch: connections) {
             ch.remove();
         }
         nodes.remove(node);
-    }
-
-    public void addConnection(@NotNull Vertex from, @NotNull Vertex to, int weight) {
-        if (exists(from, to)) {
-            from.addConnectedNode(to, weight);
-        }
     }
 
     public void removeConnection(@NotNull Vertex from, @NotNull Vertex to) {
